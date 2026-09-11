@@ -1,5 +1,7 @@
-import { SensorNode, HistoricalReading, SensorReading } from '../types/sensor';
+import { SensorNode, HistoricalReading } from '../types/sensor';
 import { ActionableAlert, TimelineEvent } from '../types/alert';
+import { RaspberryPiGateway, CitizenImpactSummary } from '../types/gateway';
+import { SafeLocation } from '../types/citizen';
 import { ISensorService, SimulationScenario, TelemetrySnapshot } from './ISensorService';
 import { calculateFloodRisk, calculateWildfireRisk } from './riskEngine';
 import { voiceAlertService } from './voiceAlertService';
@@ -25,12 +27,35 @@ export class MockSensorService implements ISensorService {
   private windSpeed: number = 14;
 
   private nodes: SensorNode[] = [];
+  private gateways: RaspberryPiGateway[] = [];
+  private safeLocations: SafeLocation[] = [];
+  private citizenImpact: CitizenImpactSummary = {
+    hazardId: 'flood',
+    zoneName: 'Eastern River Drainage 02',
+    affectedRadiusKm: 3.5,
+    estimatedCitizenPopulation: 1420,
+    notificationDelivery: {
+      inAppDelivered: 1380,
+      pushSent: 1350,
+      pushDelivered: 1325,
+      smsSent: 1280,
+      smsDelivered: 1260,
+      voiceCallsTriggered: 14,
+      totalAcknowledged: 920
+    },
+    sheltersOpenInZone: 2,
+    shelterCapacityTotal: 850,
+    shelterOccupancy: 120,
+    lastCalculatedAt: new Date().toISOString()
+  };
   private history: HistoricalReading[] = [];
   private alerts: ActionableAlert[] = [];
   private events: TimelineEvent[] = [];
 
   constructor() {
     this.initNodes();
+    this.initGateways();
+    this.initSafeLocations();
     this.initHistory();
     this.initAlertsAndEvents();
   }
@@ -82,13 +107,131 @@ export class MockSensorService implements ISensorService {
     }));
   }
 
+  private initGateways() {
+    this.gateways = [
+      {
+        id: 'GW-RPI-01',
+        name: 'Raspberry Pi Gateway (Ridge Station 01)',
+        zone: 'Northern Ridge Sector',
+        latitude: 28.640,
+        longitude: 77.220,
+        status: 'ONLINE',
+        loraStatus: 'ACTIVE',
+        loraFrequency: '868.1 MHz (IN865 Band)',
+        packetsReceivedTotal: 14820,
+        packetsPerMinute: 48,
+        packetLossRatePct: 0.2,
+        connectedNodesCount: 6,
+        cellularBackhaul: {
+          carrier: 'Jio 4G LTE Edge',
+          signalBars: 4,
+          status: 'CONNECTED',
+          ipAddress: '192.168.1.100'
+        },
+        localStorage: {
+          dbEngine: 'SQLite 3.42 (Local Edge Buffer)',
+          bufferedEvents: 0,
+          syncPending: false,
+          lastSyncedAt: 'Just now'
+        },
+        power: {
+          solarActive: true,
+          solarInputWatts: 42.5,
+          batteryPct: 96,
+          voltage: 12.8
+        },
+        firmwareVersion: 'v3.1.0-rpi4',
+        uptimeHours: 342,
+        lastHeartbeat: new Date().toISOString()
+      },
+      {
+        id: 'GW-RPI-02',
+        name: 'Raspberry Pi Gateway (River Basin 02)',
+        zone: 'Eastern Drainage Sector',
+        latitude: 28.620,
+        longitude: 77.240,
+        status: 'ONLINE',
+        loraStatus: 'ACTIVE',
+        loraFrequency: '868.3 MHz (IN865 Band)',
+        packetsReceivedTotal: 12450,
+        packetsPerMinute: 42,
+        packetLossRatePct: 0.4,
+        connectedNodesCount: 6,
+        cellularBackhaul: {
+          carrier: 'Airtel 4G LTE IoT',
+          signalBars: 5,
+          status: 'CONNECTED',
+          ipAddress: '192.168.1.101'
+        },
+        localStorage: {
+          dbEngine: 'SQLite 3.42 (Local Edge Buffer)',
+          bufferedEvents: 0,
+          syncPending: false,
+          lastSyncedAt: 'Just now'
+        },
+        power: {
+          solarActive: true,
+          solarInputWatts: 38.0,
+          batteryPct: 92,
+          voltage: 12.6
+        },
+        firmwareVersion: 'v3.1.0-rpi4',
+        uptimeHours: 298,
+        lastHeartbeat: new Date().toISOString()
+      }
+    ];
+  }
+
+  private initSafeLocations() {
+    this.safeLocations = [
+      {
+        id: 'LOC-SH-01',
+        name: 'Central District Community Relief Center',
+        hindiName: 'केंद्रीय जिला सामुदायिक राहत केंद्र',
+        type: 'shelter',
+        latitude: 28.630,
+        longitude: 77.235,
+        address: 'Near Civil Lines, Sector 4, New Delhi',
+        contactPhone: '011-23998877',
+        capacity: 500,
+        availableCapacity: 340,
+        isOperational: true
+      },
+      {
+        id: 'LOC-HOSP-01',
+        name: 'Apex Government Emergency Hospital',
+        hindiName: 'शीर्ष सरकारी आपातकालीन अस्पताल',
+        type: 'hospital',
+        latitude: 28.615,
+        longitude: 77.215,
+        address: 'Ring Road, North Block, New Delhi',
+        contactPhone: '102 / 011-26588500',
+        capacity: 350,
+        availableCapacity: 85,
+        isOperational: true
+      },
+      {
+        id: 'LOC-EVAC-01',
+        name: 'Higher Ground Evacuation Assembly Area',
+        hindiName: 'सुरक्षित ऊंचाई निकासी सभा क्षेत्र',
+        type: 'evacuation_point',
+        latitude: 28.655,
+        longitude: 77.225,
+        address: 'Ridge Forest Elevated Grounds, New Delhi',
+        contactPhone: '1078',
+        capacity: 1200,
+        availableCapacity: 1200,
+        isOperational: true
+      }
+    ];
+  }
+
   private initHistory() {
     const points: HistoricalReading[] = [];
     const now = Date.now();
     for (let i = 23; i >= 0; i--) {
       const time = new Date(now - i * 3600000);
       const hours = time.getHours().toString().padStart(2, '0') + ':00';
-      // Mild diurnal oscillation
       const sinOffset = Math.sin((i / 24) * Math.PI * 2);
       points.push({
         timestamp: time.toISOString(),
@@ -97,7 +240,7 @@ export class MockSensorService implements ISensorService {
         temperature: Math.round((27 + sinOffset * 3.5) * 10) / 10,
         humidity: Math.round(62 - sinOffset * 6),
         smokePpm: Math.round(35 + Math.abs(Math.sin(i * 1.5)) * 8),
-        rainfall: i < 3 ? 0 : 0,
+        rainfall: 0,
         riskScore: Math.round(18 + Math.abs(sinOffset) * 8)
       });
     }
@@ -117,7 +260,7 @@ export class MockSensorService implements ISensorService {
         relativeTime: '14 min ago',
         what: 'Minor water-level elevation observed.',
         why: 'Upstream canal seasonal runoff variation detected.',
-        action: 'Standard observation. Baseline remains within embankment margin.',
+        action: 'Standard observation. Embankment retention margins remain secure.',
         acknowledged: false
       },
       {
@@ -133,27 +276,12 @@ export class MockSensorService implements ISensorService {
         why: 'Solar peak heating in canopy clearing with moderate dry wind.',
         action: 'Review infrared tower camera feeds across Western Ridge.',
         acknowledged: false
-      },
-      {
-        id: 'alt-003',
-        hazard: 'landslide',
-        level: 'LOW',
-        nodeId: 'HILL-01',
-        zone: 'Southern Terraces 04',
-        riskScore: 17,
-        timestamp: new Date(Date.now() - 1000 * 60 * 55).toISOString(),
-        relativeTime: '55 min ago',
-        what: 'Soil moisture displacement test normal.',
-        why: 'Routine geotechnical strain baseline check completed.',
-        action: 'No intervention required.',
-        acknowledged: true
       }
     ];
 
-    const curTime = () => new Date().toLocaleTimeString('en-US', { hour12: false });
     this.events = [
-      { id: 'ev-1', timestamp: '12:00:15', hazard: 'flood', message: 'Sensor network routine heartbeat verified', level: 'info' },
-      { id: 'ev-2', timestamp: '12:01:02', message: 'All 8 environmental telemetry zones operational', level: 'info' },
+      { id: 'ev-1', timestamp: '12:00:15', hazard: 'flood', message: 'Sensor network routine heartbeat verified across all nodes', level: 'info' },
+      { id: 'ev-2', timestamp: '12:01:02', message: 'Raspberry Pi Gateway 01 & 02 LoRa mesh operational', level: 'info' },
       { id: 'ev-3', timestamp: '12:02:18', hazard: 'flood', message: 'River-02 calibrated depth reading at 32.4 cm', level: 'info' },
       { id: 'ev-4', timestamp: '12:03:40', hazard: 'wildfire', message: 'Forest-01 atmospheric moisture in normal range', level: 'info' }
     ];
@@ -253,7 +381,7 @@ export class MockSensorService implements ISensorService {
       timestamp: timeStr,
       message: 'CLOUD LINK SEVERED: Switching to local Edge Resilient Monitoring Mode',
       level: 'watch',
-      details: 'On-device local processing active. Telemetry and alerts stored in local buffer.'
+      details: 'Raspberry Pi SQLite local buffer engaged. LoRa packet logging active.'
     });
     this.bufferedEventsCount += 1;
     this.notify();
@@ -281,9 +409,6 @@ export class MockSensorService implements ISensorService {
     this.notify();
   }
 
-  /**
-   * Main simulation tick cycle (runs every 2.5 seconds)
-   */
   private tick() {
     const timeStr = new Date().toLocaleTimeString('en-US', { hour12: false });
 
@@ -295,7 +420,6 @@ export class MockSensorService implements ISensorService {
       this.scenarioStep += 1;
       this.prevWaterLevel = this.waterLevel;
 
-      // Stage 1: Rain initiates
       if (this.scenarioStep === 1) {
         this.rainfall = true;
         this.waterLevel = 36.2;
@@ -306,9 +430,7 @@ export class MockSensorService implements ISensorService {
           message: 'Rainfall sensor triggered: Active precipitation detected in drainage basin',
           level: 'info'
         });
-      }
-      // Stage 2: Steady rise to 46 cm
-      else if (this.scenarioStep === 2) {
+      } else if (this.scenarioStep === 2) {
         this.waterLevel = 46.5;
         this.events.unshift({
           id: 'ev-' + Date.now(),
@@ -317,32 +439,27 @@ export class MockSensorService implements ISensorService {
           message: 'Water level reached 46.5 cm. Inflow accelerating.',
           level: 'watch'
         });
-      }
-      // Stage 3: Rapid rise to 58 cm
-      else if (this.scenarioStep === 3) {
+      } else if (this.scenarioStep === 3) {
         this.waterLevel = 58.2;
         this.events.unshift({
           id: 'ev-' + Date.now(),
           timestamp: timeStr,
           hazard: 'flood',
-          message: 'Rapid rise detected (+4.7 cm/min). Flood risk increased to 68%',
+          message: 'Rapid rise detected (+4.7 cm/min). Multi-sensor confirmed. Flood risk increased to 68%',
           level: 'high'
         });
         voiceAlertService.speakFloodWarning('HIGH');
-      }
-      // Stage 4: Critical threshold breach at 71 cm
-      else if (this.scenarioStep === 4) {
+      } else if (this.scenarioStep === 4) {
         this.waterLevel = 71.8;
         this.events.unshift({
           id: 'ev-' + Date.now(),
           timestamp: timeStr,
           hazard: 'flood',
-          message: 'CRITICAL THRESHOLD BREACHED: Water level at 71.8 cm. Automated siren & voice dispatch engaged.',
+          message: 'CRITICAL THRESHOLD BREACHED: Water level at 71.8 cm. Automated siren & geofenced citizen alerts dispatched.',
           level: 'critical'
         });
         voiceAlertService.speakFloodWarning('CRITICAL');
 
-        // Push new Critical Alert
         this.alerts.unshift({
           id: 'alt-flood-' + Date.now(),
           hazard: 'flood',
@@ -352,20 +469,17 @@ export class MockSensorService implements ISensorService {
           riskScore: 88,
           timestamp: new Date().toISOString(),
           relativeTime: 'Just now',
-          what: 'Extreme surge rate of rise and critical water level.',
+          what: 'Extreme surge rate of rise (+4.8 cm/min) and critical water depth at 71.8 cm.',
           why: 'Sustained rain catchment influx exceeding secondary retention banks.',
           action: 'Immediately alert downstream emergency personnel and verify drainage floodgates.',
           acknowledged: false
         });
-      }
-      // Stage 5+: Plateau at high level with minor natural ripples
-      else {
+      } else {
         this.waterLevel = 72.0 + Math.sin(this.scenarioStep) * 0.9;
       }
     } else if (this.activeScenario === 'WILDFIRE') {
       this.scenarioStep += 1;
 
-      // Stage 1: Temperature rising, humidity dropping
       if (this.scenarioStep === 1) {
         this.temperature = 29.4;
         this.humidity = 58.0;
@@ -377,9 +491,7 @@ export class MockSensorService implements ISensorService {
           message: 'Thermal anomaly: Ambient temperature climbed to 29.4°C',
           level: 'info'
         });
-      }
-      // Stage 2: Dry air, smoke anomaly emerges
-      else if (this.scenarioStep === 2) {
+      } else if (this.scenarioStep === 2) {
         this.temperature = 31.8;
         this.humidity = 49.0;
         this.smokeLevel = 'MEDIUM';
@@ -392,9 +504,7 @@ export class MockSensorService implements ISensorService {
           message: 'Relative humidity dropped below 50%. Moderate particulate smoke detected.',
           level: 'watch'
         });
-      }
-      // Stage 3: High risk crossing
-      else if (this.scenarioStep === 3) {
+      } else if (this.scenarioStep === 3) {
         this.temperature = 33.4;
         this.humidity = 44.0;
         this.smokeLevel = 'HIGH';
@@ -408,9 +518,7 @@ export class MockSensorService implements ISensorService {
           level: 'high'
         });
         voiceAlertService.speakWildfireWarning('HIGH');
-      }
-      // Stage 4: Critical fire condition
-      else if (this.scenarioStep === 4) {
+      } else if (this.scenarioStep === 4) {
         this.temperature = 34.6;
         this.humidity = 39.0;
         this.smokeLevel = 'HIGH';
@@ -434,7 +542,7 @@ export class MockSensorService implements ISensorService {
           riskScore: 89,
           timestamp: new Date().toISOString(),
           relativeTime: 'Just now',
-          what: 'Critical combustible condition: high heat, extreme low humidity, and heavy particulate smoke.',
+          what: 'Critical combustible condition: high heat (34.6°C), dry humidity (39%), and heavy smoke particulates (380 ppm).',
           why: 'Multiple environmental indicators are moving synchronously into wildfire ignition profile.',
           action: 'Dispatch forestry aerial drone inspection; mobilize sector fire defense unit.',
           acknowledged: false
@@ -444,7 +552,6 @@ export class MockSensorService implements ISensorService {
         this.smokePpm = 385 + Math.round(Math.sin(this.scenarioStep) * 15);
       }
     } else {
-      // NORMAL MODE: Realistic organic micro-variations
       const time = Date.now() / 10000;
       this.waterLevel = Math.round((32.0 + Math.sin(time) * 0.4) * 10) / 10;
       this.temperature = Math.round((27.2 + Math.cos(time * 0.7) * 0.3) * 10) / 10;
@@ -453,10 +560,8 @@ export class MockSensorService implements ISensorService {
       this.prevWaterLevel = this.waterLevel - 0.05;
     }
 
-    // Rate of rise calculation (cm / min)
     const rateOfRise = Math.round(((this.waterLevel - this.prevWaterLevel) / 0.0416) * 10) / 10;
 
-    // Update primary target nodes
     this.nodes = this.nodes.map((node) => {
       if (node.id === 'RIVER-02') {
         const floodRisk = calculateFloodRisk(this.waterLevel, rateOfRise, this.rainfall);
@@ -493,7 +598,6 @@ export class MockSensorService implements ISensorService {
       return node;
     });
 
-    // Update rolling history point
     const currentFloodRisk = calculateFloodRisk(this.waterLevel, rateOfRise, this.rainfall);
     const currentFireRisk = calculateWildfireRisk(this.temperature, this.humidity, this.smokeLevel, this.smokePpm, this.windSpeed);
     const maxRisk = Math.max(currentFloodRisk.riskScore, currentFireRisk.riskScore);
@@ -510,18 +614,20 @@ export class MockSensorService implements ISensorService {
     };
 
     this.history = [...this.history.slice(1), newPoint];
-
     this.notify();
   }
 
   public getSnapshot(): TelemetrySnapshot {
-    const primaryFloodNode = this.nodes.find((n) => n.id === 'RIVER-02') || this.nodes[1];
+    const primaryFloodNode = this.nodes.find((n) => n.id === 'RIVER-02') || this.nodes[1] || this.nodes[0];
     const primaryWildfireNode = this.nodes.find((n) => n.id === 'FOREST-01') || this.nodes[0];
 
     return {
       nodes: [...this.nodes],
       primaryFloodNode,
       primaryWildfireNode,
+      gateways: [...this.gateways],
+      safeLocations: [...this.safeLocations],
+      citizenImpact: { ...this.citizenImpact },
       history: [...this.history],
       alerts: [...this.alerts],
       events: [...this.events],

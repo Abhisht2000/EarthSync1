@@ -13,7 +13,10 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  ShieldAlert
+  ShieldAlert,
+  Server,
+  Users,
+  Smartphone
 } from 'lucide-react';
 
 export type NavigationPage =
@@ -26,6 +29,9 @@ export type NavigationPage =
   | 'analytics'
   | 'alerts-events'
   | 'sensor-network'
+  | 'gateways'
+  | 'citizen-impact'
+  | 'apk-distribution'
   | 'settings';
 
 interface SidebarProps {
@@ -105,6 +111,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Connected Sensors',
       icon: Radio,
       badge: null
+    },
+    {
+      id: 'gateways' as NavigationPage,
+      label: 'Raspberry Pi Gateways',
+      icon: Server,
+      badge: `${snapshot.gateways?.length || 2} GW`
+    },
+    {
+      id: 'citizen-impact' as NavigationPage,
+      label: 'Citizen Impact & CAP',
+      icon: Users,
+      badge: 'NDMA'
+    },
+    {
+      id: 'apk-distribution' as NavigationPage,
+      label: 'APK & Mobile Release',
+      icon: Smartphone,
+      badge: 'APK'
     },
     {
       id: 'settings' as NavigationPage,

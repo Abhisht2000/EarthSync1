@@ -10,7 +10,9 @@ import {
   WifiOff,
   Cpu,
   Clock,
-  Sparkles
+  Sparkles,
+  Users,
+  Globe
 } from 'lucide-react';
 
 interface TopBarProps {
@@ -26,7 +28,10 @@ export const TopBar: React.FC<TopBarProps> = () => {
     setVoiceEnabled,
     testVoice,
     demoMode,
-    setDemoMode
+    setDemoMode,
+    setAppRole,
+    language,
+    setLanguage
   } = useEarthSync();
 
   const [currentTime, setCurrentTime] = useState(
@@ -141,6 +146,26 @@ export const TopBar: React.FC<TopBarProps> = () => {
           </button>
         </div>
 
+        {/* Language Quick Toggle */}
+        <div className="hidden sm:flex bg-slate-900 border border-slate-800 rounded-lg p-0.5 text-[11px] font-mono">
+          <button
+            onClick={() => setLanguage('en')}
+            className={`px-2 py-0.5 rounded transition-all ${
+              language === 'en' ? 'bg-cyan-600 text-white font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            EN
+          </button>
+          <button
+            onClick={() => setLanguage('hi')}
+            className={`px-2 py-0.5 rounded transition-all ${
+              language === 'hi' ? 'bg-cyan-600 text-white font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            हिन्दी
+          </button>
+        </div>
+
         {/* Demo Mode Button */}
         <button
           onClick={() => setDemoMode(!demoMode)}
@@ -153,6 +178,16 @@ export const TopBar: React.FC<TopBarProps> = () => {
         >
           <Cpu className="w-3.5 h-3.5 text-purple-400" />
           <span>SIMULATOR</span>
+        </button>
+
+        {/* Switch to Citizen Mode Button */}
+        <button
+          onClick={() => setAppRole('CITIZEN')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-md shadow-emerald-950/50 transition-all active:scale-95"
+          title="Switch to Citizen Safety App Interface"
+        >
+          <Users className="w-3.5 h-3.5" />
+          <span>CITIZEN APP</span>
         </button>
       </div>
     </header>

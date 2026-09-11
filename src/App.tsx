@@ -3,6 +3,7 @@ import { EarthSyncProvider, useEarthSync } from './context/EarthSyncContext';
 import { SplashScreen } from './components/brand/SplashScreen';
 import { TopBar } from './components/navigation/TopBar';
 import { Sidebar, NavigationPage } from './components/navigation/Sidebar';
+import { CitizenLayout } from './components/citizen/CitizenLayout';
 import { CommandCenter } from './pages/CommandCenter';
 import { LiveMonitoring } from './pages/LiveMonitoring';
 import { FloodIntelligence } from './pages/FloodIntelligence';
@@ -12,7 +13,10 @@ import { ScenarioSimulator } from './pages/ScenarioSimulator';
 import { Analytics } from './pages/Analytics';
 import { AlertsEvents } from './pages/AlertsEvents';
 import { SensorNetwork } from './pages/SensorNetwork';
+import { GatewayNetwork } from './pages/GatewayNetwork';
+import { CitizenImpact } from './pages/CitizenImpact';
 import { SystemSettings } from './pages/SystemSettings';
+import { PublicTestingHub } from './components/public/PublicTestingHub';
 import {
   Sparkles,
   Waves,
@@ -24,7 +28,7 @@ import {
   Volume2
 } from 'lucide-react';
 
-const MainLayout: React.FC = () => {
+const AuthorityLayout: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<NavigationPage>('command-center');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -62,6 +66,12 @@ const MainLayout: React.FC = () => {
         return <AlertsEvents />;
       case 'sensor-network':
         return <SensorNetwork />;
+      case 'gateways':
+        return <GatewayNetwork />;
+      case 'citizen-impact':
+        return <CitizenImpact />;
+      case 'apk-distribution':
+        return <PublicTestingHub />;
       case 'settings':
         return <SystemSettings />;
       default:
@@ -74,7 +84,7 @@ const MainLayout: React.FC = () => {
       {/* Top Status & Navigation Bar */}
       <TopBar onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
 
-      {/* Critical Hazard Alert Banner (Hackathon WOW moment) */}
+      {/* Critical Hazard Alert Banner */}
       {isCritical && (
         <div className="bg-red-950/90 border-b border-red-600/80 px-4 py-2 flex items-center justify-between text-xs font-mono text-red-200 animate-pulse z-20 shadow-[0_0_20px_rgba(239,68,68,0.3)]">
           <div className="flex items-center gap-2">
@@ -191,6 +201,16 @@ const MainLayout: React.FC = () => {
   );
 };
 
+const AppContent: React.FC = () => {
+  const { appRole } = useEarthSync();
+
+  if (appRole === 'CITIZEN') {
+    return <CitizenLayout />;
+  }
+
+  return <AuthorityLayout />;
+};
+
 export function App() {
   const [showSplash, setShowSplash] = useState(true);
 
@@ -199,7 +219,7 @@ export function App() {
       {showSplash ? (
         <SplashScreen onComplete={() => setShowSplash(false)} />
       ) : (
-        <MainLayout />
+        <AppContent />
       )}
     </EarthSyncProvider>
   );

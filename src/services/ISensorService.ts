@@ -1,5 +1,7 @@
-import { SensorReading, SensorNode, HistoricalReading } from '../types/sensor';
+import { SensorNode, HistoricalReading } from '../types/sensor';
 import { ActionableAlert, TimelineEvent } from '../types/alert';
+import { RaspberryPiGateway, CitizenImpactSummary } from '../types/gateway';
+import { SafeLocation } from '../types/citizen';
 
 export type SimulationScenario = 'NORMAL' | 'FLOOD' | 'WILDFIRE' | 'NETWORK_FAILURE';
 
@@ -7,6 +9,9 @@ export interface TelemetrySnapshot {
   nodes: SensorNode[];
   primaryFloodNode: SensorNode;
   primaryWildfireNode: SensorNode;
+  gateways: RaspberryPiGateway[];
+  safeLocations: SafeLocation[];
+  citizenImpact: CitizenImpactSummary;
   history: HistoricalReading[];
   alerts: ActionableAlert[];
   events: TimelineEvent[];
