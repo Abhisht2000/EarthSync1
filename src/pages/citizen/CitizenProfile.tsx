@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useEarthSync } from '../../context/EarthSyncContext';
 import { DICTIONARY } from '../../services/localization';
+import { AuthorityAuthModal } from '../../components/auth/AuthorityAuthModal';
 import {
   User,
   Phone,
@@ -32,12 +33,13 @@ export const CitizenProfile: React.FC = () => {
     updateUserLocation,
     language,
     setLanguage,
-    setAppRole,
     voiceMuted,
     setVoiceMuted,
     isOffline,
     isHardwareConnected
   } = useEarthSync();
+
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const t = DICTIONARY[language];
 
@@ -326,7 +328,7 @@ export const CitizenProfile: React.FC = () => {
         </div>
 
         <button
-          onClick={() => setAppRole('AUTHORITY')}
+          onClick={() => setShowAuthModal(true)}
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-950/50 transition-all active:scale-95 shrink-0"
         >
           <span>{language === 'hi' ? 'कमांड सेंटर खोलें' : 'Switch to Command Center'}</span>
@@ -348,6 +350,12 @@ export const CitizenProfile: React.FC = () => {
           {isOffline ? 'Offline Standalone' : 'Connected'}
         </span>
       </div>
+
+      {/* Authority Security Verification Modal */}
+      <AuthorityAuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
     </div>
   );
 };
