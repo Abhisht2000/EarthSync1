@@ -14,7 +14,8 @@ import {
   Users,
   Globe,
   SlidersHorizontal,
-  LogOut
+  LogOut,
+  Download
 } from 'lucide-react';
 
 interface TopBarProps {
@@ -228,6 +229,17 @@ export const TopBar: React.FC<TopBarProps> = ({
           </span>
           <span className={`w-1.5 h-1.5 rounded-full ${gpsGranted ? 'bg-cyan-400 animate-pulse' : 'bg-slate-600'}`} title={gpsGranted ? 'GPS Active' : 'GPS Off'} />
         </div>
+
+        {/* Direct APK Download Button */}
+        <a
+          href="/downloads/EarthSync.apk"
+          download="EarthSync.apk"
+          className="hidden sm:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold transition-all shadow-md active:scale-95 shrink-0"
+          title="Download Android APK Package (4.4 MB)"
+        >
+          <Download className="w-3.5 h-3.5 text-cyan-400" />
+          <span>APK</span>
+        </a>
 
         {/* Switch to Citizen Mode Button */}
         <button

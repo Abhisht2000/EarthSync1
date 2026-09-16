@@ -78,11 +78,12 @@ export const CitizenTopBar: React.FC<CitizenTopBarProps> = ({ onOpenAuth, onNavi
           <a
             href="/downloads/EarthSync.apk"
             download="EarthSync.apk"
-            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/80 text-emerald-300 text-xs font-mono font-bold transition-all shadow-md active:scale-95 shrink-0"
+            className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold transition-all shadow-md active:scale-95 shrink-0 border border-emerald-400/40"
             title="Download Android APK Package (4.4 MB)"
           >
-            <Download className="w-3.5 h-3.5 text-emerald-400" />
-            <span>APK (4.4MB)</span>
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden xs:inline">APK</span>
+            <span className="hidden sm:inline">(4.4MB)</span>
           </a>
 
           {/* Quick Helpline Button */}
