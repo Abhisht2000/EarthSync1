@@ -3,6 +3,7 @@ import { useEarthSync } from '../../context/EarthSyncContext';
 import { EarthSyncLogo } from '../brand/EarthSyncLogo';
 import { DICTIONARY } from '../../services/localization';
 import { AuthorityAuthModal } from '../auth/AuthorityAuthModal';
+import { CitizenTab } from './CitizenBottomNav';
 import {
   ShieldCheck,
   Globe,
@@ -11,14 +12,17 @@ import {
   VolumeX,
   Layers,
   Sparkles,
-  LogOut
+  LogOut,
+  Download,
+  Smartphone
 } from 'lucide-react';
 
 interface CitizenTopBarProps {
   onOpenAuth?: () => void;
+  onNavigateTab?: (tab: CitizenTab) => void;
 }
 
-export const CitizenTopBar: React.FC<CitizenTopBarProps> = ({ onOpenAuth }) => {
+export const CitizenTopBar: React.FC<CitizenTopBarProps> = ({ onOpenAuth, onNavigateTab }) => {
   const {
     language,
     setLanguage,
@@ -69,6 +73,17 @@ export const CitizenTopBar: React.FC<CitizenTopBarProps> = ({ onOpenAuth }) => {
           >
             {voiceEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
           </button>
+
+          {/* Direct APK Download / Mobile App Action */}
+          <a
+            href="/downloads/EarthSync.apk"
+            download="EarthSync.apk"
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/80 text-emerald-300 text-xs font-mono font-bold transition-all shadow-md active:scale-95 shrink-0"
+            title="Download Android APK Package (4.4 MB)"
+          >
+            <Download className="w-3.5 h-3.5 text-emerald-400" />
+            <span>APK (4.4MB)</span>
+          </a>
 
           {/* Quick Helpline Button */}
           <a

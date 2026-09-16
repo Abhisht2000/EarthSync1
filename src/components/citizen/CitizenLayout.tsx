@@ -7,6 +7,7 @@ import { CitizenMap } from '../../pages/citizen/CitizenMap';
 import { CitizenAlerts } from '../../pages/citizen/CitizenAlerts';
 import { CitizenGuides } from '../../pages/citizen/CitizenGuides';
 import { CitizenProfile } from '../../pages/citizen/CitizenProfile';
+import { PublicTestingHub } from '../public/PublicTestingHub';
 import { WifiOff, AlertCircle } from 'lucide-react';
 import { DICTIONARY } from '../../services/localization';
 
@@ -26,7 +27,7 @@ export const CitizenLayout: React.FC = () => {
       )}
 
       {/* Citizen Top Bar */}
-      <CitizenTopBar />
+      <CitizenTopBar onNavigateTab={setActiveTab} />
 
       {/* Main Container View Area */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-4 pt-3 sm:pt-4 pb-24 pb-safe touch-scroll">
@@ -34,7 +35,8 @@ export const CitizenLayout: React.FC = () => {
         {activeTab === 'map' && <CitizenMap />}
         {activeTab === 'alerts' && <CitizenAlerts />}
         {activeTab === 'guides' && <CitizenGuides />}
-        {activeTab === 'profile' && <CitizenProfile />}
+        {activeTab === 'apk' && <PublicTestingHub onClose={() => setActiveTab('home')} />}
+        {activeTab === 'profile' && <CitizenProfile onNavigate={setActiveTab} />}
       </main>
 
       {/* Mobile-First Sticky Bottom Navigation */}

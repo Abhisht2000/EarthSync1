@@ -19,7 +19,9 @@ import {
   Flame,
   Sun,
   Mountain,
-  Navigation
+  Navigation,
+  Download,
+  Smartphone
 } from 'lucide-react';
 
 interface CitizenHomeProps {
@@ -320,7 +322,48 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* 4. MULTI-HAZARD SECTOR READINESS */}
+      {/* 4. OFFLINE APK & MOBILE INSTALL CARD */}
+      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-950/60 via-slate-900 to-cyan-950/60 border border-emerald-500/40 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-lg shadow-emerald-950/50">
+            <Smartphone className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold text-white">
+                {language === 'hi' ? 'EarthSync एंड्रॉइड APK डाउनलोड करें' : 'Download EarthSync Android App (APK)'}
+              </h3>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-950 border border-emerald-700 text-emerald-300 font-mono text-[10px] font-bold">
+                v1.0.4 · 4.4 MB
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {language === 'hi'
+                ? 'नेटवर्क ब्लैकआउट के दौरान भी 100% ऑफलाइन कार्य करता है।'
+                : 'Standalone Android installation with zero-latency offline map & background alerts.'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={() => onNavigate('apk')}
+            className="flex-1 sm:flex-initial px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all border border-slate-700 text-center"
+          >
+            {language === 'hi' ? 'विवरण' : 'Hub'}
+          </button>
+          <a
+            href="/downloads/EarthSync.apk"
+            download="EarthSync.apk"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-950/50 transition-all active:scale-95 shrink-0"
+          >
+            <Download className="w-4 h-4" />
+            <span>{language === 'hi' ? 'डाउनलोड APK' : 'Download APK'}</span>
+          </a>
+        </div>
+      </div>
+
+      {/* 5. MULTI-HAZARD SECTOR READINESS */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-3 font-mono text-xs">
         <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
           REGIONAL HAZARD MONITORING SUMMARY

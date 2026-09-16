@@ -7,10 +7,11 @@ import {
   Bell,
   BookOpen,
   User,
+  Smartphone,
   AlertTriangle
 } from 'lucide-react';
 
-export type CitizenTab = 'home' | 'map' | 'alerts' | 'guides' | 'profile';
+export type CitizenTab = 'home' | 'map' | 'alerts' | 'guides' | 'apk' | 'profile';
 
 interface CitizenBottomNavProps {
   activeTab: CitizenTab;
@@ -31,6 +32,7 @@ export const CitizenBottomNav: React.FC<CitizenBottomNavProps> = ({
     { id: 'map', label: t.navMap, icon: Map },
     { id: 'alerts', label: t.navAlerts, icon: Bell, badge: nearbyHazards.length > 0 ? nearbyHazards.length : undefined },
     { id: 'guides', label: t.navGuides, icon: BookOpen },
+    { id: 'apk', label: t.navApk || 'Get APK', icon: Smartphone },
     { id: 'profile', label: t.navProfile, icon: User }
   ];
 

@@ -14,8 +14,12 @@ import {
   CheckCircle2,
   Plus,
   Trash2,
-  ArrowRight
+  ArrowRight,
+  Download,
+  Smartphone,
+  Sparkles
 } from 'lucide-react';
+import { CitizenTab } from '../../components/citizen/CitizenBottomNav';
 
 const PRESET_DISTRICTS = [
   { name: 'Dehradun (Song River Basin)', state: 'Uttarakhand', lat: 30.3165, lon: 78.0322 },
@@ -27,7 +31,7 @@ const PRESET_DISTRICTS = [
   { name: 'Mumbai (Coastal Zone)', state: 'Maharashtra', lat: 19.0760, lon: 72.8777 }
 ];
 
-export const CitizenProfile: React.FC = () => {
+export const CitizenProfile: React.FC<{ onNavigate?: (tab: CitizenTab) => void }> = ({ onNavigate }) => {
   const {
     currentUser,
     updateUserLocation,
@@ -306,6 +310,49 @@ export const CitizenProfile: React.FC = () => {
               </button>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Download Android APK & Mobile App Package */}
+      <div className="bg-gradient-to-r from-emerald-950/50 via-slate-900 to-cyan-950/50 border border-emerald-500/40 rounded-2xl p-4 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-lg shadow-emerald-950/50">
+            <Smartphone className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold text-white">
+                {language === 'hi' ? 'एंड्रॉइड ऐप (APK) डाउनलोड करें' : 'Download Android App (APK)'}
+              </h3>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-950 border border-emerald-700 text-emerald-300 font-mono text-[10px] font-bold">
+                4.4 MB
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {language === 'hi'
+                ? 'फोन पर बिना इंटरनेट सीधे इंस्टॉल करें। 100% ऑफलाइन सहायता एवं जीपीएस अलर्ट।'
+                : 'Install standalone native app with offline cache, live GPS alerts & PWA support.'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          {onNavigate && (
+            <button
+              onClick={() => onNavigate('apk')}
+              className="flex-1 sm:flex-initial px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all border border-slate-700 text-center"
+            >
+              {language === 'hi' ? 'विवरण' : 'Hub'}
+            </button>
+          )}
+          <a
+            href="/downloads/EarthSync.apk"
+            download="EarthSync.apk"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-950/50 transition-all active:scale-95 shrink-0"
+          >
+            <Download className="w-4 h-4" />
+            <span>{language === 'hi' ? 'APK डाउनलोड' : 'Download APK'}</span>
+          </a>
         </div>
       </div>
 

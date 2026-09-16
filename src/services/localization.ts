@@ -21,6 +21,7 @@ export const DICTIONARY = {
     navMap: 'Safe Map',
     navAlerts: 'Alerts',
     navGuides: 'Guides',
+    navApk: 'Get APK',
     navProfile: 'Settings',
 
     // Role Switcher
@@ -101,6 +102,7 @@ export const DICTIONARY = {
     navMap: 'सुरक्षित नक्शा',
     navAlerts: 'चेतावनी',
     navGuides: 'मार्गदर्शिका',
+    navApk: 'APK ऐप',
     navProfile: 'सेटिंग्स',
 
     // Role Switcher
