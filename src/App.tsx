@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { EarthSyncProvider, useEarthSync } from './context/EarthSyncContext';
 import { SplashScreen } from './components/brand/SplashScreen';
+import { GPSPermissionModal } from './components/onboarding/GPSPermissionModal';
+import { LoginScreen } from './components/onboarding/LoginScreen';
 import { TopBar } from './components/navigation/TopBar';
 import { Sidebar, NavigationPage } from './components/navigation/Sidebar';
 import { CitizenLayout } from './components/citizen/CitizenLayout';
@@ -31,6 +33,7 @@ import {
 const AuthorityLayout: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<NavigationPage>('command-center');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const {
     snapshot,
@@ -82,21 +85,26 @@ const AuthorityLayout: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#070a13] text-slate-100 selection:bg-cyan-500 selection:text-black">
       {/* Top Status & Navigation Bar */}
-      <TopBar onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
+      <TopBar
+        onToggleSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+        isMobileSidebarOpen={mobileSidebarOpen}
+      />
 
       {/* Critical Hazard Alert Banner */}
       {isCritical && (
-        <div className="bg-red-950/90 border-b border-red-600/80 px-4 py-2 flex items-center justify-between text-xs font-mono text-red-200 animate-pulse z-20 shadow-[0_0_20px_rgba(239,68,68,0.3)]">
+        <div className="bg-red-950/90 border-b border-red-600/80 px-3 sm:px-4 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono text-red-200 animate-pulse z-20 shadow-[0_0_20px_rgba(239,68,68,0.3)]">
           <div className="flex items-center gap-2">
-            <AlertOctagon className="w-4 h-4 text-red-400 animate-bounce" />
-            <strong className="text-white font-black uppercase tracking-wider">
-              CRITICAL HAZARD DETECTED:
-            </strong>
-            <span>
-              {floodRisk.riskLevel === 'CRITICAL'
-                ? `River Node 02 Water Surge (${floodRisk.riskScore}%)`
-                : `Forest Node 01 Wildfire Anomaly (${wildfireRisk.riskScore}%)`}
-            </span>
+            <AlertOctagon className="w-4 h-4 text-red-400 animate-bounce shrink-0" />
+            <div>
+              <strong className="text-white font-black uppercase tracking-wider mr-1.5">
+                CRITICAL HAZARD DETECTED:
+              </strong>
+              <span>
+                {floodRisk.riskLevel === 'CRITICAL'
+                  ? `River Node 02 Water Surge (${floodRisk.riskScore}%)`
+                  : `Forest Node 01 Wildfire Anomaly (${wildfireRisk.riskScore}%)`}
+              </span>
+            </div>
           </div>
 
           <button
@@ -105,7 +113,7 @@ const AuthorityLayout: React.FC = () => {
                 floodRisk.riskLevel === 'CRITICAL' ? 'flood' : 'wildfire'
               )
             }
-            className="px-2.5 py-1 rounded bg-red-600 hover:bg-red-500 text-white font-bold transition-colors"
+            className="px-2.5 py-1 rounded bg-red-600 hover:bg-red-500 text-white font-bold transition-colors self-end sm:self-auto shrink-0"
           >
             INSPECT HAZARD DECK →
           </button>
@@ -116,23 +124,29 @@ const AuthorityLayout: React.FC = () => {
       <div className="flex-1 flex overflow-hidden">
         <Sidebar
           currentPage={currentPage}
-          onSelectPage={setCurrentPage}
+          onSelectPage={(page) => {
+            setCurrentPage(page);
+            setMobileSidebarOpen(false);
+          }}
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          mobileOpen={mobileSidebarOpen}
+          onCloseMobile={() => setMobileSidebarOpen(false)}
         />
 
         {/* Dynamic Page Container */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(14,116,144,0.12),rgba(255,255,255,0))]">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 touch-scroll bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(14,116,144,0.12),rgba(255,255,255,0))]">
           <div className="max-w-7xl mx-auto">{renderCurrentPage()}</div>
         </main>
       </div>
 
       {/* Floating Demo Mode Quick Bar (When enabled) */}
       {demoMode && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-40 bg-slate-950/95 border border-purple-500/70 p-2.5 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-2 font-mono text-xs animate-in slide-in-from-bottom duration-300">
-          <div className="flex items-center gap-1.5 px-2 text-purple-300 font-bold border-r border-slate-800 pr-3">
+        <div className="fixed bottom-3 sm:bottom-4 left-1/2 transform -translate-x-1/2 z-40 bg-slate-950/95 border border-purple-500/70 p-2 sm:p-2.5 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-1.5 sm:gap-2 font-mono text-xs max-w-[94vw] overflow-x-auto touch-scroll animate-in slide-in-from-bottom duration-300">
+          <div className="flex items-center gap-1.5 px-2 text-purple-300 font-bold border-r border-slate-800 pr-2.5 shrink-0">
             <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-spin" />
-            <span>DEMO MODE</span>
+            <span className="hidden sm:inline">DEMO MODE</span>
+            <span className="sm:hidden">DEMO</span>
           </div>
 
           <button
@@ -202,13 +216,34 @@ const AuthorityLayout: React.FC = () => {
 };
 
 const AppContent: React.FC = () => {
-  const { appRole } = useEarthSync();
+  const { appRole, isAuthenticated, setGpsGranted, startLocationTracking } = useEarthSync();
+  const [showGpsModal, setShowGpsModal] = useState(() => {
+    return localStorage.getItem('earthsync_gps_granted') === null;
+  });
 
-  if (appRole === 'CITIZEN') {
-    return <CitizenLayout />;
-  }
+  const handleGpsGranted = () => {
+    setGpsGranted(true);
+    startLocationTracking();
+    setShowGpsModal(false);
+  };
 
-  return <AuthorityLayout />;
+  const handleGpsSkipped = () => {
+    setShowGpsModal(false);
+  };
+
+  return (
+    <>
+      {!isAuthenticated ? <LoginScreen /> : <>
+      {showGpsModal && (
+        <GPSPermissionModal
+          onGranted={handleGpsGranted}
+          onSkipped={handleGpsSkipped}
+        />
+      )}
+      {appRole === 'CITIZEN' ? <CitizenLayout /> : <AuthorityLayout />}
+      </>}
+    </>
+  );
 };
 
 export function App() {

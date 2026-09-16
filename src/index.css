@@ -9,8 +9,31 @@
     padding: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 }
+
+/* Safe Area Insets for Modern Mobile Notches & Bottom Gesture Bars */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.pl-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Mobile Touch Scroll Smoothing */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
 
 /* Custom Sleek Command Center Scrollbars */
 ::-webkit-scrollbar {
@@ -38,6 +61,29 @@
   background: #090e1a !important;
   font-family: inherit;
 }
+
+/* Custom Tile Filters for Seamless GIS Basemaps */
+.map-tiles-dark {
+  filter: invert(1) hue-rotate(180deg) brightness(88%) contrast(95%);
+}
+
+.map-tiles-satellite {
+  filter: brightness(0.95) contrast(1.05);
+}
+
+.map-tiles-terrain {
+  filter: brightness(0.95) contrast(1.05);
+}
+
+.map-tiles-light {
+  filter: brightness(1);
+}
+
+.map-tiles-outdoor {
+  filter: brightness(1);
+}
+
+
 
 .leaflet-bar {
   border: 1px solid rgba(51, 65, 85, 0.8) !important;

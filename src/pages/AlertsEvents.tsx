@@ -26,20 +26,20 @@ export const AlertsEvents: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Alerts Header */}
-      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 lg:p-6 backdrop-blur-md shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-4 sm:p-5 lg:p-6 backdrop-blur-md shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-mono font-bold tracking-widest text-amber-400 uppercase">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <span className="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-amber-400 uppercase">
               EARLY WARNING DISPATCH LOG
             </span>
             <span className="text-slate-500">•</span>
-            <span className="text-xs font-mono text-slate-400">
+            <span className="text-[10px] sm:text-xs font-mono text-slate-400">
               OPERATIONS ESCALATION LOG
             </span>
           </div>
-          <h1 className="text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-3">
-            <Bell className="w-7 h-7 text-amber-400" />
-            ACTIONABLE ALERTS & CHRONOLOGICAL INCIDENTS
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-2.5 sm:gap-3">
+            <Bell className="w-6 h-6 sm:w-7 h-7 text-amber-400 shrink-0" />
+            <span>ACTIONABLE ALERTS & INCIDENTS</span>
           </h1>
           <p className="text-xs font-mono text-slate-400 mt-1">
             Deterministic alarms generated with WHAT, WHY, SEVERITY, and NEXT ACTION directives.
@@ -50,7 +50,7 @@ export const AlertsEvents: React.FC = () => {
         {unacknowledgedCount > 0 && (
           <button
             onClick={handleAcknowledgeAll}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-bold border border-slate-700 transition-colors shadow-lg"
+            className="flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-bold border border-slate-700 transition-colors shadow-lg shrink-0 w-full sm:w-auto"
           >
             <CheckCheck className="w-4 h-4 text-emerald-400" />
             ACKNOWLEDGE ALL ({unacknowledgedCount})
@@ -59,15 +59,15 @@ export const AlertsEvents: React.FC = () => {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-900/80 border border-slate-800 rounded-xl font-mono text-xs">
-        <span className="text-slate-400 px-2 flex items-center gap-1">
+      <div className="flex items-center gap-1.5 p-1.5 bg-slate-900/80 border border-slate-800 rounded-xl font-mono text-xs overflow-x-auto touch-scroll">
+        <span className="text-slate-400 px-2 flex items-center gap-1 shrink-0">
           <Filter className="w-3.5 h-3.5" /> FILTER:
         </span>
         {['ALL', 'UNACKNOWLEDGED', 'CRITICAL', 'HIGH', 'WATCH', 'LOW'].map((lvl) => (
           <button
             key={lvl}
             onClick={() => setFilterLevel(lvl)}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
+            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
               filterLevel === lvl
                 ? 'bg-cyan-950 text-cyan-300 font-bold border border-cyan-800 shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'

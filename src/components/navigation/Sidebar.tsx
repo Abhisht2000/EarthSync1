@@ -16,7 +16,8 @@ import {
   ShieldAlert,
   Server,
   Users,
-  Smartphone
+  Smartphone,
+  X
 } from 'lucide-react';
 
 export type NavigationPage =
@@ -39,13 +40,17 @@ interface SidebarProps {
   onSelectPage: (page: NavigationPage) => void;
   collapsed: boolean;
   onToggleCollapse: () => void;
+  mobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   currentPage,
   onSelectPage,
   collapsed,
-  onToggleCollapse
+  onToggleCollapse,
+  mobileOpen = false,
+  onCloseMobile
 }) => {
   const { snapshot, floodRisk, wildfireRisk } = useEarthSync();
 
@@ -138,94 +143,158 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  return (
-    <aside
-      className={`bg-[#080d1a] border-r border-slate-800/80 transition-all duration-300 ease-in-out flex flex-col justify-between select-none z-20 flex-shrink-0 ${
-        collapsed ? 'w-18' : 'w-64'
-      }`}
-    >
-      {/* Navigation Header / Items */}
-      <div className="p-3 space-y-1 overflow-y-auto overflow-x-hidden">
-        <div className="px-3 py-2 text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">
-          {!collapsed ? 'OPERATIONS DECK' : 'OPS'}
-        </div>
-
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = currentPage === item.id;
-
-          return (
-            <button
-              key={item.id}
-              onClick={() => onSelectPage(item.id)}
-              title={collapsed ? item.label : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group relative ${
-                isActive
-                  ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-700/50 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80 border border-transparent'
-              }`}
-            >
-              <Icon
-                className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                  isActive
-                    ? 'text-cyan-400'
-                    : 'text-slate-500 group-hover:text-slate-300'
-                }`}
-              />
-
-              {!collapsed && (
-                <span className="truncate tracking-wide">{item.label}</span>
-              )}
-
-              {/* Badges */}
-              {!collapsed && item.badge && (
-                <span
-                  className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded border ${
-                    item.badgeColor ||
-                    'bg-slate-900 border-slate-800 text-slate-400'
-                  }`}
-                >
-                  {item.badge}
-                </span>
-              )}
-
-              {collapsed && item.badge && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400" />
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Footer Section: Collapse Toggle & Hackathon Prototype Notice */}
-      <div className="p-3 border-t border-slate-800/80 space-y-2">
-        {!collapsed && (
-          <div className="px-3 py-2 rounded-lg bg-slate-900/60 border border-slate-800/60 text-[11px] text-slate-400 font-mono">
-            <div className="flex items-center gap-1.5 text-cyan-400 font-semibold mb-1">
-              <ShieldAlert className="w-3.5 h-3.5" />
-              <span>SIH PROTOTYPE</span>
-            </div>
-            <p className="text-[10px] text-slate-400 leading-tight">
-              Decoupled Multi-Hazard Architecture Ready for ESP32 Hardware
-            </p>
-          </div>
+  const renderNavButtons = (isMobile: boolean) => (
+    <div className="p-3 space-y-1 overflow-y-auto overflow-x-hidden flex-1 touch-scroll">
+      <div className="px-3 py-2 text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase flex items-center justify-between">
+        <span>{!collapsed || isMobile ? 'OPERATIONS DECK' : 'OPS'}</span>
+        {isMobile && (
+          <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 font-bold">
+            AUTHORITY
+          </span>
         )}
-
-        <button
-          onClick={onToggleCollapse}
-          className="w-full flex items-center justify-center gap-2 p-2 rounded-lg bg-slate-900/50 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 text-xs font-mono transition-colors"
-          title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-        >
-          {collapsed ? (
-            <ChevronRight className="w-4 h-4" />
-          ) : (
-            <>
-              <ChevronLeft className="w-4 h-4" />
-              <span>COLLAPSE</span>
-            </>
-          )}
-        </button>
       </div>
-    </aside>
+
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const isActive = currentPage === item.id;
+
+        return (
+          <button
+            key={item.id}
+            onClick={() => {
+              onSelectPage(item.id);
+              if (isMobile && onCloseMobile) {
+                onCloseMobile();
+              }
+            }}
+            title={collapsed && !isMobile ? item.label : undefined}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group relative active:scale-98 ${
+              isActive
+                ? 'bg-cyan-950/70 text-cyan-300 border border-cyan-600/60 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80 border border-transparent'
+            }`}
+          >
+            <Icon
+              className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                isActive
+                  ? 'text-cyan-400'
+                  : 'text-slate-500 group-hover:text-slate-300'
+              }`}
+            />
+
+            {(!collapsed || isMobile) && (
+              <span className="truncate tracking-wide text-left flex-1">{item.label}</span>
+            )}
+
+            {/* Badges */}
+            {(!collapsed || isMobile) && item.badge && (
+              <span
+                className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded border ${
+                  item.badgeColor ||
+                  'bg-slate-900 border-slate-800 text-slate-400'
+                }`}
+              >
+                {item.badge}
+              </span>
+            )}
+
+            {collapsed && !isMobile && item.badge && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400" />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <>
+      {/* 1. Mobile Off-Canvas Drawer (Screens < lg) */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Dark blurred backdrop overlay */}
+          <div
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+            onClick={onCloseMobile}
+            aria-hidden="true"
+          />
+
+          {/* Drawer Body */}
+          <aside className="relative w-72 max-w-[85vw] bg-[#080d1a] border-r border-slate-800 flex flex-col justify-between z-50 shadow-2xl animate-in slide-in-from-left duration-200 pt-safe pb-safe select-none">
+            {/* Drawer Header */}
+            <div className="p-4 border-b border-slate-800/80 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
+                <span className="font-mono text-xs font-bold text-white tracking-wider uppercase">
+                  NAVIGATION MENU
+                </span>
+              </div>
+              <button
+                onClick={onCloseMobile}
+                className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 active:scale-95"
+                aria-label="Close navigation"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Navigation Items */}
+            {renderNavButtons(true)}
+
+            {/* Mobile Drawer Footer */}
+            <div className="p-3 border-t border-slate-800/80 space-y-2.5 bg-slate-950/40">
+              <div className="px-3 py-2 rounded-lg bg-slate-900/60 border border-slate-800/60 text-[11px] text-slate-400 font-mono">
+                <div className="flex items-center gap-1.5 text-cyan-400 font-semibold mb-1">
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                  <span>SIH PROTOTYPE</span>
+                </div>
+                <p className="text-[10px] text-slate-400 leading-tight">
+                  Decoupled Multi-Hazard Architecture Ready for ESP32 Hardware
+                </p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      {/* 2. Desktop Persistent Sidebar (Screens >= lg) */}
+      <aside
+        className={`hidden lg:flex bg-[#080d1a] border-r border-slate-800/80 transition-all duration-300 ease-in-out flex-col justify-between select-none z-20 flex-shrink-0 ${
+          collapsed ? 'w-18' : 'w-64'
+        }`}
+      >
+        {renderNavButtons(false)}
+
+        {/* Footer Section: Collapse Toggle & Notice */}
+        <div className="p-3 border-t border-slate-800/80 space-y-2">
+          {!collapsed && (
+            <div className="px-3 py-2 rounded-lg bg-slate-900/60 border border-slate-800/60 text-[11px] text-slate-400 font-mono">
+              <div className="flex items-center gap-1.5 text-cyan-400 font-semibold mb-1">
+                <ShieldAlert className="w-3.5 h-3.5" />
+                <span>SIH PROTOTYPE</span>
+              </div>
+              <p className="text-[10px] text-slate-400 leading-tight">
+                Decoupled Multi-Hazard Architecture Ready for ESP32 Hardware
+              </p>
+            </div>
+          )}
+
+          <button
+            onClick={onToggleCollapse}
+            className="w-full flex items-center justify-center gap-2 p-2 rounded-lg bg-slate-900/50 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 text-xs font-mono transition-colors"
+            title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+          >
+            {collapsed ? (
+              <ChevronRight className="w-4 h-4" />
+            ) : (
+              <>
+                <ChevronLeft className="w-4 h-4" />
+                <span>COLLAPSE</span>
+              </>
+            )}
+          </button>
+        </div>
+      </aside>
+    </>
   );
 };

@@ -31,6 +31,7 @@ const state = {
   isEdgeMode: false,
   bufferedEventsCount: 0,
   lastSyncTime: new Date().toLocaleTimeString('en-US', { hour12: false }),
+  history: [],
   otpStore: {}, // phone -> { otp, expiresAt }
   userSessions: {}, // token -> user
   users: [
@@ -498,32 +499,66 @@ app.post('/api/sensors/ingest', (req, res) => {
     return res.status(400).json({ error: 'Missing nodeId or reading payload' });
   }
 
+  // NodeMCU firmware sends an explicit local alarm after its on-device
+  // debounce has fired. Respect that edge decision in the dashboard status.
+  const isAlarmed = reading.alarm === true || reading.alarm === 'true';
+  const isWatch = !isAlarmed && (
+    reading.rainfall === true ||
+    reading.smokeLevel === 'MEDIUM' ||
+    Number(reading.waterLevel) >= 10
+  );
+  const nodeStatus = isAlarmed ? 'CRITICAL' : isWatch ? 'WARNING' : 'ONLINE';
+
   reading.timestamp = reading.timestamp || new Date().toISOString();
 
   // Find or create node in state
   let node = state.nodes.find((n) => n.id === reading.nodeId);
   if (node) {
+    const previousReading = node.lastReading;
+    const elapsedMinutes = (new Date(reading.timestamp).getTime() - new Date(previousReading.timestamp).getTime()) / 60000;
+    if (Number.isFinite(elapsedMinutes) && elapsedMinutes > 0 && reading.waterLevel !== undefined) {
+      reading.rateOfRise = Math.round(((reading.waterLevel - previousReading.waterLevel) / elapsedMinutes) * 10) / 10;
+    }
     node.lastReading = { ...node.lastReading, ...reading };
     node.battery = reading.battery ?? node.battery;
     node.signalRssi = reading.signalRssi ?? node.signalRssi;
+    node.status = nodeStatus;
+    node.firmwareVersion = 'NodeMCU ESP8266';
+    node.hardwareConnected = true;
+    node.lastSeenAt = reading.timestamp;
     node.lastUpdated = 'Just now';
   } else {
     node = {
       id: reading.nodeId,
-      name: `ESP32 Node (${reading.nodeId})`,
+      name: `NodeMCU ESP8266 (${reading.nodeId})`,
       hazardType: reading.waterLevel !== undefined ? 'flood' : 'wildfire',
       zone: 'Field Deployed Sector',
       latitude: 28.625,
       longitude: 77.225,
-      status: 'ONLINE',
+      status: nodeStatus,
       battery: reading.battery || 90,
       signalRssi: reading.signalRssi || -70,
-      firmwareVersion: 'v2.4.1-esp32',
+      firmwareVersion: 'NodeMCU ESP8266',
+      hardwareConnected: true,
+      lastSeenAt: reading.timestamp,
       lastUpdated: 'Just now',
       lastReading: reading
     };
     state.nodes.push(node);
   }
+
+  state.history.push({
+    nodeId: reading.nodeId,
+    timestamp: reading.timestamp,
+    timeLabel: new Date(reading.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+    waterLevel: Number(reading.waterLevel) || 0,
+    temperature: Number(reading.temperature) || 0,
+    humidity: Number(reading.humidity) || 0,
+    smokePpm: Number(reading.smokePpm) || 0,
+    rainfall: reading.rainfall ? 1 : 0,
+    riskScore: 0
+  });
+  state.history = state.history.slice(-120);
 
   // Broadcast reading update to all connected WebSocket clients
   const message = JSON.stringify({
@@ -603,14 +638,17 @@ const wss = new WebSocketServer({ server, path: '/ws' });
 
 // Build comprehensive snapshot for WebSocket sync
 function buildFullSnapshot() {
+  // Only devices that have actually posted telemetry belong in hardware mode.
+  const hardwareNodes = state.nodes.filter((node) => node.hardwareConnected);
   return {
-    nodes: state.nodes,
-    primaryFloodNode: state.nodes.find((n) => n.id === 'RIVER-02') || state.nodes[1] || state.nodes[0],
-    primaryWildfireNode: state.nodes.find((n) => n.id === 'FOREST-01') || state.nodes[0],
+    nodes: hardwareNodes,
+    primaryFloodNode: hardwareNodes.find((n) => n.hazardType === 'flood'),
+    primaryWildfireNode: hardwareNodes.find((n) => n.hazardType === 'wildfire'),
     alerts: state.alerts,
     gateways: state.gateways,
     safeLocations: state.safeLocations,
     citizenImpact: state.citizenImpact,
+    history: state.history,
     activeScenario: state.activeScenario,
     scenarioStep: state.scenarioStep,
     isEdgeMode: state.isEdgeMode,
@@ -618,6 +656,13 @@ function buildFullSnapshot() {
     bufferedEventsCount: state.bufferedEventsCount,
     lastSyncTime: state.lastSyncTime
   };
+}
+
+function broadcastSnapshot() {
+  const message = JSON.stringify({ type: 'SNAPSHOT', payload: buildFullSnapshot() });
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) client.send(message);
+  });
 }
 
 wss.on('connection', (ws, req) => {
@@ -671,6 +716,20 @@ const pingInterval = setInterval(() => {
     ws.ping();
   });
 }, 30000);
+
+// Firmware sends every 3 seconds. Mark the node offline after 15 seconds
+// without a heartbeat instead of presenting stale telemetry as live.
+setInterval(() => {
+  const cutoff = Date.now() - 15000;
+  let changed = false;
+  state.nodes.forEach((node) => {
+    if (node.hardwareConnected && node.status !== 'OFFLINE' && new Date(node.lastSeenAt).getTime() < cutoff) {
+      node.status = 'OFFLINE';
+      changed = true;
+    }
+  });
+  if (changed) broadcastSnapshot();
+}, 5000);
 
 wss.on('close', () => {
   clearInterval(pingInterval);

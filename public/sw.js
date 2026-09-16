@@ -1,4 +1,5 @@
-const CACHE_NAME = 'earthsync-v1';
+const CACHE_NAME = 'earthsync-v3';
+
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -18,7 +19,9 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
       );
     })
   );
@@ -26,11 +29,22 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests and skip WebSocket / API calls for cache-first strategy
-  if (event.request.method !== 'GET' || event.request.url.includes('/api/') || event.request.url.includes('/ws')) {
+  const url = event.request.url;
+
+  // Skip non-GET, API, WebSocket, and external tile requests. External map
+  // hosts handle image caching themselves; intercepting them can block tiles.
+  if (
+    event.request.method !== 'GET' ||
+    url.includes('/api/') ||
+    url.includes('/ws') ||
+    url.startsWith('chrome-extension://') ||
+    url.includes('tile.openstreetmap.org') ||
+    url.includes('tile.opentopomap.org')
+  ) {
     return;
   }
 
+  // App Assets Caching Strategy (Stale-While-Revalidate)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -45,19 +59,21 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
 
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+      return fetch(event.request)
+        .then((networkResponse) => {
+          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+            return networkResponse;
+          }
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
           return networkResponse;
-        }
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
+        })
+        .catch(() => {
+          // Offline fallback
+          return caches.match('/');
         });
-        return networkResponse;
-      }).catch(() => {
-        // Offline fallback
-        return caches.match('/');
-      });
     })
   );
 });

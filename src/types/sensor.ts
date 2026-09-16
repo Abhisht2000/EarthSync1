@@ -38,6 +38,7 @@ export interface SensorNode {
 }
 
 export interface HistoricalReading {
+  nodeId?: string;
   timestamp: string;
   timeLabel: string;
   waterLevel: number;

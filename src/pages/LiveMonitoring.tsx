@@ -36,21 +36,21 @@ export const LiveMonitoring: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 lg:p-6 backdrop-blur-md shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-4 sm:p-5 lg:p-6 backdrop-blur-md shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <span className="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase">
               DISTRIBUTED SENSOR TELEMETRY
             </span>
             <span className="text-slate-500">•</span>
-            <span className="text-xs font-mono text-emerald-400 font-bold flex items-center gap-1">
+            <span className="text-[10px] sm:text-xs font-mono text-emerald-400 font-bold flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               100% INGESTION EFFICIENCY
             </span>
           </div>
-          <h1 className="text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-3">
-            <Activity className="w-7 h-7 text-cyan-400" />
-            LIVE ENVIRONMENTAL MONITORING MATRIX
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-2.5 sm:gap-3">
+            <Activity className="w-6 h-6 sm:w-7 h-7 text-cyan-400 shrink-0" />
+            <span>LIVE ENVIRONMENTAL MONITORING</span>
           </h1>
           <p className="text-xs font-mono text-slate-400 mt-1">
             Real-time physical observation parameters received from field-deployed edge nodes.
@@ -58,22 +58,22 @@ export const LiveMonitoring: React.FC = () => {
         </div>
 
         {/* Filter controls */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
             <input
               type="text"
               placeholder="Search node or zone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs font-mono text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-48 sm:w-60"
+              className="bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 sm:py-1.5 text-xs font-mono text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-full sm:w-60"
             />
           </div>
 
           <select
             value={selectedZone}
             onChange={(e) => setSelectedZone(e.target.value)}
-            className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs font-mono text-slate-300 focus:outline-none focus:border-cyan-500"
+            className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 sm:py-1.5 text-xs font-mono text-slate-300 focus:outline-none focus:border-cyan-500 shrink-0"
           >
             {zones.map((z) => (
               <option key={z} value={z}>

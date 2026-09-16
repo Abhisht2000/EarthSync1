@@ -25,7 +25,7 @@ export const WildfireIntelligence: React.FC = () => {
 
   const badgeClasses = getRiskBadgeClasses(wildfireRisk.riskLevel);
 
-  const chartData = snapshot.history.map((h) => ({
+  const chartData = snapshot.history.filter((h) => !h.nodeId || h.nodeId === snapshot.primaryWildfireNode?.id).map((h) => ({
     time: h.timeLabel,
     temperature: h.temperature,
     humidity: h.humidity,
@@ -36,23 +36,23 @@ export const WildfireIntelligence: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Wildfire Header */}
-      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 lg:p-6 backdrop-blur-md shadow-xl relative overflow-hidden">
+      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-4 sm:p-5 lg:p-6 backdrop-blur-md shadow-xl relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-600 via-amber-500 to-red-500" />
 
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono font-bold tracking-widest text-orange-400 uppercase">
+              <span className="text-[11px] sm:text-xs font-mono font-bold tracking-widest text-orange-400 uppercase">
                 THERMAL & COMBUSTION INTELLIGENCE
               </span>
               <span className="text-slate-500">•</span>
-              <span className="text-xs font-mono text-slate-400">
-                FOREST NODE 01 (DEEP RIDGE)
+              <span className="text-[11px] sm:text-xs font-mono text-slate-400">
+                FOREST NODE 01
               </span>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-3">
-              <Flame className="w-7 h-7 text-orange-500" />
-              WILDFIRE INTELLIGENCE & COMBUSTION MONITORING
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-2.5 sm:gap-3">
+              <Flame className="w-6 h-6 sm:w-7 sm:h-7 text-orange-500 shrink-0" />
+              <span>WILDFIRE INTELLIGENCE & COMBUSTION</span>
             </h1>
             <p className="text-xs font-mono text-slate-400 mt-1">
               Multi-sensor fusion correlating ambient heat desiccation, relative moisture loss, and MQ-2 particulate anomalies.
@@ -60,20 +60,20 @@ export const WildfireIntelligence: React.FC = () => {
           </div>
 
           {/* Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setScenario('WILDFIRE')}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-mono font-bold shadow-lg transition-all"
+              className="flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-mono font-bold shadow-lg transition-all active:scale-95 shrink-0"
             >
               <Play className="w-3.5 h-3.5" />
-              SIMULATE WILDFIRE ESCALATION
+              <span>SIMULATE WILDFIRE</span>
             </button>
             <button
               onClick={resetToNormal}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition-colors active:scale-95 shrink-0"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              RESET
+              <span>RESET</span>
             </button>
           </div>
         </div>
@@ -81,7 +81,7 @@ export const WildfireIntelligence: React.FC = () => {
         {/* Plain Language Interpretation Banner */}
         <div className="mt-4 p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-mono flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-orange-400 font-bold uppercase">WHAT THIS MEANS:</span>
+            <span className="text-orange-400 font-bold uppercase shrink-0">WHAT THIS MEANS:</span>
             <span className="text-slate-200">
               {fireReading.temperature >= 32 && (fireReading.smokeLevel === 'HIGH' || fireReading.smokePpm > 150)
                 ? '⚠️ Temperature is high, humidity is low, and smoke is elevated. Multiple wildfire warning signs detected.'
@@ -90,84 +90,84 @@ export const WildfireIntelligence: React.FC = () => {
                 : '✓ Canopy temperature and humidity are normal. No active wildfire danger.'}
             </span>
           </div>
-          <span className="text-[11px] text-slate-400 hidden sm:inline">
+          <span className="text-[11px] text-slate-400 hidden md:inline shrink-0">
             Prototype Risk Model
           </span>
         </div>
 
         {/* 5 Primary Indicators */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5 mt-4 pt-4 border-t border-slate-800/80">
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
-            <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3.5 mt-4 pt-4 border-t border-slate-800/80">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
+            <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block mb-1">
               TEMPERATURE
             </span>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-mono font-black text-orange-400">
+              <span className="text-2xl sm:text-3xl font-mono font-black text-orange-400">
                 {fireReading.temperature.toFixed(1)}
               </span>
               <span className="text-xs font-mono text-slate-400 font-bold">°C</span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 mt-1 block">
-              Sensor: DHT22 / BME280
+            <span className="text-[10px] font-mono text-slate-400 mt-1 block truncate">
+              DHT22 / BME280
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
-            <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
+            <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block mb-1">
               RELATIVE HUMIDITY
             </span>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-mono font-black text-cyan-400">
+              <span className="text-2xl sm:text-3xl font-mono font-black text-cyan-400">
                 {Math.round(fireReading.humidity)}
               </span>
               <span className="text-xs font-mono text-slate-400 font-bold">%</span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 mt-1 block">
+            <span className="text-[10px] font-mono text-slate-400 mt-1 block truncate">
               Fuel Desiccation Index
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
-            <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
+            <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block mb-1">
               SMOKE ANOMALY
             </span>
-            <div className="flex items-baseline gap-2 mt-1">
-              <span className={`text-xl font-mono font-black ${fireReading.smokeLevel === 'HIGH' ? 'text-red-400 animate-pulse' : fireReading.smokeLevel === 'MEDIUM' ? 'text-amber-400' : 'text-slate-300'}`}>
+            <div className="flex items-baseline gap-1 sm:gap-2 mt-1">
+              <span className={`text-lg sm:text-xl font-mono font-black ${fireReading.smokeLevel === 'HIGH' ? 'text-red-400 animate-pulse' : fireReading.smokeLevel === 'MEDIUM' ? 'text-amber-400' : 'text-slate-300'}`}>
                 {fireReading.smokeLevel}
               </span>
-              <span className="text-xs font-mono text-slate-400">
+              <span className="text-[10px] sm:text-xs font-mono text-slate-400 truncate">
                 ({fireReading.smokePpm} ppm)
               </span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 mt-1 block">
+            <span className="text-[10px] font-mono text-slate-400 mt-1 block truncate">
               MQ-2 Gas / Particulate
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
-            <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
+            <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block mb-1">
               FIRE RISK SCORE
             </span>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-mono font-black text-white">
+              <span className="text-2xl sm:text-3xl font-mono font-black text-white">
                 {wildfireRisk.riskScore}
               </span>
               <span className="text-xs font-mono text-slate-400 font-bold">%</span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 mt-1 block">
-              POTENTIAL WILDFIRE RISK
+            <span className="text-[10px] font-mono text-slate-400 mt-1 block truncate">
+              POTENTIAL RISK
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70 flex flex-col justify-center">
-            <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70 flex flex-col justify-center col-span-2 sm:col-span-1">
+            <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block mb-1">
               SEVERITY LEVEL
             </span>
             <span className={`px-2.5 py-1 rounded text-xs font-mono font-bold uppercase border text-center ${badgeClasses}`}>
               {wildfireRisk.riskLevel}
             </span>
             <span className="text-[10px] font-mono text-slate-400 text-center mt-1">
-              Wind: {fireReading.windSpeed} km/h NNW
+              Wind: {fireReading.windSpeed} km/h
             </span>
           </div>
         </div>
@@ -181,7 +181,7 @@ export const WildfireIntelligence: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Chart 1: Temperature */}
-          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4">
+          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4 min-w-0">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs font-mono font-bold text-orange-400 uppercase">
                 1. CANOPY TEMPERATURE (°C)
@@ -210,7 +210,7 @@ export const WildfireIntelligence: React.FC = () => {
           </div>
 
           {/* Chart 2: Humidity */}
-          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4">
+          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4 min-w-0">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs font-mono font-bold text-cyan-400 uppercase">
                 2. RELATIVE HUMIDITY (%)
@@ -239,7 +239,7 @@ export const WildfireIntelligence: React.FC = () => {
           </div>
 
           {/* Chart 3: Smoke PPM */}
-          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4">
+          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4 min-w-0">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs font-mono font-bold text-amber-400 uppercase">
                 3. SMOKE PARTICULATE DENSITY (ppm)
@@ -268,7 +268,7 @@ export const WildfireIntelligence: React.FC = () => {
           </div>
 
           {/* Chart 4: Fire Risk */}
-          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4">
+          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4 min-w-0">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs font-mono font-bold text-red-400 uppercase">
                 4. POTENTIAL WILDFIRE RISK (%)

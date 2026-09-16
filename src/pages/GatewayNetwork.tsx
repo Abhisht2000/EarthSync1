@@ -32,13 +32,13 @@ export const GatewayNetwork: React.FC = () => {
   return (
     <div className="space-y-6 font-sans">
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/80 border border-slate-800 p-5 rounded-2xl backdrop-blur-md">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/80 border border-slate-800 p-4 sm:p-5 rounded-2xl backdrop-blur-md">
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 uppercase tracking-wider mb-1">
-            <Server className="w-4 h-4" />
+          <div className="flex items-center gap-2 text-[10px] sm:text-xs font-mono text-cyan-400 uppercase tracking-wider mb-1">
+            <Server className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>EDGE INFRASTRUCTURE LAYER</span>
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
             Raspberry Pi & LoRa Gateway Mesh
           </h1>
           <p className="text-xs text-slate-400 mt-1">
@@ -46,15 +46,15 @@ export const GatewayNetwork: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-slate-300">
+        <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto touch-scroll shrink-0">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] sm:text-xs font-mono text-slate-300 whitespace-nowrap">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>{gateways.filter((g) => g.status === 'ONLINE').length}/{gateways.length} GATEWAYS ACTIVE</span>
+            <span>{gateways.filter((g) => g.status === 'ONLINE').length}/{gateways.length} ACTIVE</span>
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-cyan-950/40 border border-cyan-800/60 text-xs font-mono text-cyan-300">
-            <Radio className="w-4 h-4 text-cyan-400 animate-pulse" />
-            <span>LORA FREQ: IN865 / 868 MHz</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-cyan-950/40 border border-cyan-800/60 text-[11px] sm:text-xs font-mono text-cyan-300 whitespace-nowrap">
+            <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span>IN865 / 868 MHz</span>
           </div>
         </div>
       </div>

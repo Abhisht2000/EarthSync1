@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+  <rect width="1200" height="800" fill="#080d18"/>
+  <g fill="none" stroke="#1c2a3c" stroke-width="2" opacity=".9">
+    <path d="M-40 150 C170 110 255 230 420 185 S665 80 1240 170"/>
+    <path d="M-30 310 C170 260 310 340 465 285 S800 215 1240 330"/>
+    <path d="M-20 490 C170 430 340 530 525 470 S820 390 1230 490"/>
+    <path d="M-30 660 C145 610 350 700 565 630 S930 580 1230 680"/>
+    <path d="M160 -30 C120 170 220 280 175 470 S255 680 210 830"/>
+    <path d="M405 -20 C355 145 485 285 430 465 S500 670 455 830"/>
+    <path d="M695 -20 C625 160 755 295 690 465 S750 645 710 830"/>
+    <path d="M980 -20 C895 145 1035 300 965 470 S1035 645 1000 830"/>
+  </g>
+  <g fill="none" stroke="#264157" stroke-width="5" opacity=".8">
+    <path d="M-20 570 C160 530 240 425 390 455 S635 640 810 535 S1030 410 1220 445"/>
+    <path d="M120 810 C205 625 290 535 425 405 S660 145 815 -10"/>
+    <path d="M-20 240 C170 250 290 170 440 260 S735 340 915 215 S1060 120 1230 175"/>
+  </g>
+  <path d="M-20 370 C190 325 337 380 520 352 S820 295 1220 350" fill="none" stroke="#0d7490" stroke-width="10" opacity=".65"/>
+  <g fill="#5a7186" font-family="system-ui, sans-serif" font-size="19" font-weight="700" letter-spacing="3" opacity=".8">
+    <text x="500" y="395" font-size="32">NEW DELHI</text>
+    <text x="220" y="275">ROHINI</text><text x="670" y="225">SHAHDARA</text>
+    <text x="825" y="520">NOIDA</text><text x="145" y="550">DWARKA</text>
+    <text x="445" y="615">NIZAMUDDIN</text><text x="885" y="335">GHAZIABAD</text>
+  </g>
+  <g fill="#19c4e4" opacity=".85"><circle cx="580" cy="390" r="5"/><circle cx="765" cy="485" r="4"/><circle cx="430" cy="470" r="4"/></g>
+  <text x="24" y="770" fill="#7190a7" font-family="monospace" font-size="13" letter-spacing="2">EARTHSYNC OFFLINE BASEMAP · EXTERNAL TILES UNAVAILABLE</text>
+</svg>

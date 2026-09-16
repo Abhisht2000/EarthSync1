@@ -30,20 +30,20 @@ export const SensorNetwork: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Network Header */}
-      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 lg:p-6 backdrop-blur-md shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-4 sm:p-5 lg:p-6 backdrop-blur-md shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <span className="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase">
               HARDWARE FLEET INVENTORY
             </span>
             <span className="text-slate-500">•</span>
-            <span className="text-xs font-mono text-slate-400">
+            <span className="text-[10px] sm:text-xs font-mono text-slate-400">
               ESP32 FIELD MICROCONTROLLER NODES
             </span>
           </div>
-          <h1 className="text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-3">
-            <Radio className="w-7 h-7 text-cyan-400" />
-            SENSOR NETWORK & HARDWARE INTEGRITY
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-2.5 sm:gap-3">
+            <Radio className="w-6 h-6 sm:w-7 h-7 text-cyan-400 shrink-0" />
+            <span>SENSOR NETWORK INTEGRITY</span>
           </h1>
           <p className="text-xs font-mono text-slate-400 mt-1">
             Continuous health monitoring of distributed wireless nodes, battery reserves, RSSI links, and sensor staleness.
@@ -51,29 +51,29 @@ export const SensorNetwork: React.FC = () => {
         </div>
 
         {/* Fleet KPI Badges */}
-        <div className="flex items-center gap-2 font-mono text-xs">
-          <div className="px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800 text-emerald-400">
+        <div className="flex items-center gap-2 font-mono text-[11px] sm:text-xs overflow-x-auto touch-scroll shrink-0">
+          <div className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800 text-emerald-400 whitespace-nowrap">
             ONLINE: <strong>{onlineCount}</strong>
           </div>
-          <div className="px-3 py-1.5 rounded-lg bg-amber-950/60 border border-amber-800 text-amber-400">
+          <div className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-950/60 border border-amber-800 text-amber-400 whitespace-nowrap">
             WARNING: <strong>{warningCount}</strong>
           </div>
-          <div className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400">
+          <div className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 whitespace-nowrap">
             OFFLINE: <strong>{offlineCount}</strong>
           </div>
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-900/80 border border-slate-800 rounded-xl font-mono text-xs">
-        <span className="text-slate-400 px-2 flex items-center gap-1">
+      <div className="flex items-center gap-1.5 p-1.5 bg-slate-900/80 border border-slate-800 rounded-xl font-mono text-xs overflow-x-auto touch-scroll">
+        <span className="text-slate-400 px-2 flex items-center gap-1 shrink-0">
           <Filter className="w-3.5 h-3.5" /> FILTER:
         </span>
         {(['ALL', 'ONLINE', 'WARNING', 'OFFLINE'] as const).map((status) => (
           <button
             key={status}
             onClick={() => setStatusFilter(status)}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
+            className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
               statusFilter === status
                 ? 'bg-cyan-950 text-cyan-300 font-bold border border-cyan-800 shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'

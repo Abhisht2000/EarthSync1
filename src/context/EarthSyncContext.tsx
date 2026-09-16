@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useMemo } from 'react';
 import { ISensorService, SimulationScenario, TelemetrySnapshot } from '../services/ISensorService';
 import { mockSensorService } from '../services/mockSensorService';
 import { esp32SensorService } from '../services/esp32SensorService';
@@ -7,6 +7,12 @@ import { voiceAlertService } from '../services/voiceAlertService';
 import { RiskAssessment } from '../types/risk';
 import { CitizenSafetyStatus, CitizenUser, GeofencedHazard, SafeLocation, UserLocation } from '../types/citizen';
 import { Language } from '../services/localization';
+import {
+  computeEvacuationRoute,
+  startLocationWatch,
+  stopLocationWatch,
+  EvacuationRoute
+} from '../services/evacuationRouteService';
 
 export type AppRole = 'CITIZEN' | 'AUTHORITY' | 'ADMIN';
 
@@ -27,6 +33,9 @@ interface EarthSyncContextType {
   snapshot: TelemetrySnapshot;
   appRole: AppRole;
   setAppRole: (role: AppRole) => void;
+  isAuthenticated: boolean;
+  signIn: (details: { name: string; phoneNumber: string; role: 'CITIZEN' | 'AUTHORITY' }) => void;
+  signOut: () => void;
   language: Language;
   setLanguage: (lang: Language) => void;
   currentUser: CitizenUser;
@@ -60,12 +69,36 @@ interface EarthSyncContextType {
   setDemoMode: (enabled: boolean) => void;
   updateUserLocation: (loc: Partial<UserLocation>) => void;
   requestDeviceLocation: () => Promise<boolean>;
+  // GPS tracking
+  gpsGranted: boolean;
+  setGpsGranted: (v: boolean) => void;
+  isTrackingLocation: boolean;
+  startLocationTracking: () => void;
+  stopLocationTracking: () => void;
+  evacuationRoute: EvacuationRoute | null;
+  evacuationEtaMinutes: number;
 }
 
 const EarthSyncContext = createContext<EarthSyncContextType | undefined>(undefined);
 
 export const EarthSyncProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [appRole, setAppRole] = useState<AppRole>('AUTHORITY');
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('earthsync_user_profile') || '{}').authenticated === true;
+    } catch {
+      return false;
+    }
+  });
+  const [appRole, setAppRole] = useState<AppRole>(() => {
+    try {
+      const saved = localStorage.getItem('earthsync_user_profile');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.role) return parsed.role;
+      }
+    } catch {}
+    return 'AUTHORITY';
+  });
   const [language, setLanguage] = useState<Language>('en');
   const [activeServiceType, setActiveServiceType] = useState<'MOCK' | 'ESP32'>('MOCK');
   const [snapshot, setSnapshot] = useState<TelemetrySnapshot>(() => mockSensorService.getSnapshot());
@@ -73,30 +106,48 @@ export const EarthSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [speakingText, setSpeakingText] = useState('');
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [demoMode, setDemoMode] = useState(false);
+  const [gpsGranted, setGpsGranted] = useState(
+    () => localStorage.getItem('earthsync_gps_granted') === 'true'
+  );
+  const [isTrackingLocation, setIsTrackingLocation] = useState(false);
+  const watchActiveRef = useRef(false);
 
-  // Citizen profile state
-  const [currentUser, setCurrentUser] = useState<CitizenUser>({
-    id: 'usr-default',
-    phoneNumber: '+91 9876543210',
-    name: 'Citizen User',
-    language: 'en',
-    location: {
-      latitude: 28.625,
-      longitude: 77.225,
-      district: 'Central District',
-      state: 'New Delhi',
-      areaName: 'Civil Lines Catchment Sector',
-      timestamp: new Date().toISOString()
-    },
-    safetyStatus: 'SAFE',
-    notificationsEnabled: true,
-    voiceAlertsEnabled: true,
-    smsAlertsEnabled: true,
-    emergencyContacts: [
-      { id: 'ec-1', name: 'National Emergency Helpline', phone: '112', relation: 'Disaster Authority' },
-      { id: 'ec-2', name: 'District Disaster Control (DDMA)', phone: '1078', relation: 'Disaster Cell' }
-    ],
-    authenticated: true
+  // Citizen profile state (hydrated from localStorage if available)
+  const [currentUser, setCurrentUser] = useState<CitizenUser>(() => {
+    let initialName = 'Citizen User';
+    let initialPhone = '+91 98765 43210';
+    try {
+      const saved = localStorage.getItem('earthsync_user_profile');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.name) initialName = parsed.name;
+        if (parsed.phoneNumber) initialPhone = parsed.phoneNumber;
+      }
+    } catch {}
+
+    return {
+      id: 'usr-default',
+      phoneNumber: initialPhone,
+      name: initialName,
+      language: 'en',
+      location: {
+        latitude: 28.625,
+        longitude: 77.225,
+        district: 'Central District',
+        state: 'New Delhi',
+        areaName: 'Civil Lines Catchment Sector',
+        timestamp: new Date().toISOString()
+      },
+      safetyStatus: 'SAFE',
+      notificationsEnabled: true,
+      voiceAlertsEnabled: true,
+      smsAlertsEnabled: true,
+      emergencyContacts: [
+        { id: 'ec-1', name: 'National Emergency Helpline', phone: '112', relation: 'Disaster Authority' },
+        { id: 'ec-2', name: 'District Disaster Control (DDMA)', phone: '1078', relation: 'Disaster Cell' }
+      ],
+      authenticated: isAuthenticated
+    };
   });
 
   const service: ISensorService = activeServiceType === 'MOCK' ? mockSensorService : esp32SensorService;
@@ -326,6 +377,59 @@ export const EarthSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return false;
   };
 
+  const startLocationTracking = () => {
+    if (watchActiveRef.current) return;
+    watchActiveRef.current = true;
+    setIsTrackingLocation(true);
+    startLocationWatch(
+      (lat, lng, accuracy) => {
+        updateUserLocation({
+          latitude: lat,
+          longitude: lng,
+          accuracyMeters: Math.round(accuracy),
+          areaName: 'Live GPS Position'
+        });
+      },
+      (errMsg) => {
+        console.warn('[EarthSync GPS]', errMsg);
+        watchActiveRef.current = false;
+        setIsTrackingLocation(false);
+      }
+    );
+  };
+
+  const stopLocationTracking = () => {
+    stopLocationWatch();
+    watchActiveRef.current = false;
+    setIsTrackingLocation(false);
+  };
+
+  // Auto-start tracking when GPS is granted
+  useEffect(() => {
+    if (gpsGranted && !watchActiveRef.current) {
+      startLocationTracking();
+    }
+    return () => { if (watchActiveRef.current) stopLocationTracking(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gpsGranted]);
+
+  // Evacuation route — recomputed whenever user location or safe locations change
+  const evacuationRoute: EvacuationRoute | null = useMemo(() => {
+    const nearest = closestSafeLocations.find((loc) => loc.isOperational);
+    if (!nearest) return null;
+    const avoidFlood = floodRisk.riskLevel === 'CRITICAL' || floodRisk.riskLevel === 'HIGH';
+    return computeEvacuationRoute(
+      currentUser.location.latitude,
+      currentUser.location.longitude,
+      nearest.latitude,
+      nearest.longitude,
+      nearest.name,
+      avoidFlood
+    );
+  }, [currentUser.location, closestSafeLocations, floodRisk.riskLevel]);
+
+  const evacuationEtaMinutes = evacuationRoute?.etaMinutes ?? 0;
+
   const handleSetScenario = (scenario: SimulationScenario) => {
     service.setScenario(scenario);
   };
@@ -350,12 +454,34 @@ export const EarthSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     voiceAlertService.testAlert();
   };
 
+  const signIn = (details: { name: string; phoneNumber: string; role: 'CITIZEN' | 'AUTHORITY' }) => {
+    const profile = {
+      name: details.name.trim() || (details.role === 'AUTHORITY' ? 'Authority Operator' : 'Citizen User'),
+      phoneNumber: details.phoneNumber.trim() || '+91 98765 43210',
+      role: details.role,
+      authenticated: true
+    };
+    setCurrentUser((previous) => ({ ...previous, ...profile }));
+    setAppRole(profile.role);
+    setIsAuthenticated(true);
+    localStorage.setItem('earthsync_user_profile', JSON.stringify(profile));
+  };
+
+  const signOut = () => {
+    setIsAuthenticated(false);
+    setCurrentUser((previous) => ({ ...previous, authenticated: false }));
+    localStorage.removeItem('earthsync_user_profile');
+  };
+
   return (
     <EarthSyncContext.Provider
       value={{
         snapshot,
         appRole,
         setAppRole,
+        isAuthenticated,
+        signIn,
+        signOut,
         language,
         setLanguage,
         currentUser,
@@ -388,7 +514,14 @@ export const EarthSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         demoMode,
         setDemoMode,
         updateUserLocation,
-        requestDeviceLocation
+        requestDeviceLocation,
+        gpsGranted,
+        setGpsGranted,
+        isTrackingLocation,
+        startLocationTracking,
+        stopLocationTracking,
+        evacuationRoute,
+        evacuationEtaMinutes
       }}
     >
       {children}

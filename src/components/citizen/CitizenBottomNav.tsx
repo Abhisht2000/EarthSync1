@@ -35,7 +35,7 @@ export const CitizenBottomNav: React.FC<CitizenBottomNavProps> = ({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#090e1c]/95 border-t border-slate-800/90 backdrop-blur-xl px-2 py-1.5 flex items-center justify-around select-none shadow-2xl">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#090e1c]/95 border-t border-slate-800/90 backdrop-blur-xl px-1 sm:px-2 pt-1.5 pb-safe pb-2 flex items-center justify-around select-none shadow-2xl">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
@@ -44,7 +44,7 @@ export const CitizenBottomNav: React.FC<CitizenBottomNavProps> = ({
           <button
             key={tab.id}
             onClick={() => onSelectTab(tab.id)}
-            className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all relative ${
+            className={`flex flex-col items-center justify-center flex-1 py-1.5 px-0.5 rounded-xl transition-all relative min-h-[48px] active:scale-95 ${
               isActive
                 ? 'text-cyan-400 font-bold'
                 : 'text-slate-400 hover:text-slate-200'
@@ -53,12 +53,12 @@ export const CitizenBottomNav: React.FC<CitizenBottomNavProps> = ({
             <div className="relative">
               <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110' : ''}`} />
               {tab.badge && (
-                <span className="absolute -top-1 -right-2 w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-mono font-black flex items-center justify-center animate-bounce">
+                <span className="absolute -top-1 -right-2.5 w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-mono font-black flex items-center justify-center animate-bounce shadow-md">
                   {tab.badge}
                 </span>
               )}
             </div>
-            <span className="text-[11px] font-mono tracking-wide mt-1">
+            <span className="text-[10px] sm:text-[11px] font-mono tracking-wide mt-1 truncate max-w-[65px] sm:max-w-none text-center">
               {tab.label}
             </span>
           </button>

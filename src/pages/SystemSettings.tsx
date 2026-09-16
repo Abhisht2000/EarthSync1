@@ -35,13 +35,15 @@ export const SystemSettings: React.FC = () => {
   const defaultApiHost =
     (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL)
       ? import.meta.env.VITE_API_URL + '/api/sensors/ingest'
-      : (typeof window !== 'undefined' ? window.location.origin + '/api/sensors/ingest' : 'http://localhost:5000/api/sensors/ingest');
+      : (typeof window !== 'undefined'
+          ? `${window.location.protocol}//${window.location.hostname}:5000/api/sensors/ingest`
+          : 'http://localhost:5000/api/sensors/ingest');
 
   const defaultWsHost =
     (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_WS_URL)
       ? import.meta.env.VITE_WS_URL
       : (typeof window !== 'undefined'
-          ? (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/ws'
+          ? (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.hostname + ':5000/ws'
           : 'ws://localhost:5000/ws');
 
   const [esp32Host, setEsp32Host] = useState(defaultApiHost);
@@ -71,20 +73,20 @@ export const SystemSettings: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Settings Header */}
-      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 lg:p-6 backdrop-blur-md shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-4 sm:p-5 lg:p-6 backdrop-blur-md shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <span className="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase">
               OPERATIONS PLATFORM CONFIGURATION
             </span>
             <span className="text-slate-500">•</span>
-            <span className="text-xs font-mono text-slate-400">
+            <span className="text-[10px] sm:text-xs font-mono text-slate-400">
               MISSION CONTROL PARAMETERS
             </span>
           </div>
-          <h1 className="text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-3">
-            <Settings className="w-7 h-7 text-cyan-400" />
-            SYSTEM SETTINGS & HARDWARE INTEGRATION
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-2.5 sm:gap-3">
+            <Settings className="w-6 h-6 sm:w-7 h-7 text-cyan-400 shrink-0" />
+            <span>SYSTEM SETTINGS & HARDWARE</span>
           </h1>
           <p className="text-xs font-mono text-slate-400 mt-1">
             Fine-tune speech synthesis voices, early warning debounce, risk formulas, and ESP32 hardware bridges.
@@ -92,7 +94,7 @@ export const SystemSettings: React.FC = () => {
         </div>
 
         {saveSuccess && (
-          <div className="px-3.5 py-2 rounded-lg bg-emerald-950/80 border border-emerald-700 text-emerald-300 font-mono text-xs flex items-center gap-2 animate-in fade-in">
+          <div className="px-3.5 py-2 rounded-lg bg-emerald-950/80 border border-emerald-700 text-emerald-300 font-mono text-xs flex items-center gap-2 animate-in fade-in shrink-0">
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
             Settings saved successfully!
           </div>
@@ -212,7 +214,7 @@ export const SystemSettings: React.FC = () => {
               <Server className="w-4 h-4" />
               <span>HARDWARE INTEGRATION & DATA SOURCE</span>
             </div>
-            <span className="text-xs font-mono text-slate-400">ESP32 BRIDGE</span>
+            <span className="text-xs font-mono text-slate-400">ESP8266 / ESP32 BRIDGE</span>
           </div>
 
           <div className="space-y-4 font-mono text-xs">
@@ -244,7 +246,7 @@ export const SystemSettings: React.FC = () => {
                       : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
                   }`}
                 >
-                  <span className="block text-sm">ESP32SensorService</span>
+                  <span className="block text-sm">ESP8266 / ESP32 Live Service</span>
                   <span className="text-[10px] text-slate-400 block mt-0.5">
                     Live WebSocket / REST link
                   </span>

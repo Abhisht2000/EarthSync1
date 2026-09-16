@@ -18,7 +18,8 @@ import {
   Waves,
   Flame,
   Sun,
-  Mountain
+  Mountain,
+  Navigation
 } from 'lucide-react';
 
 interface CitizenHomeProps {
@@ -36,7 +37,10 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({ onNavigate }) => {
     wildfireRisk,
     heatwaveRisk,
     landslideRisk,
-    snapshot
+    snapshot,
+    evacuationRoute,
+    evacuationEtaMinutes,
+    isTrackingLocation
   } = useEarthSync();
 
   const t = DICTIONARY[language];
@@ -250,6 +254,44 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({ onNavigate }) => {
               <a href={`tel:${closestShelter.contactPhone}`} className="text-cyan-400 font-bold underline">
                 Call Shelter
               </a>
+            </div>
+          </div>
+        )}
+
+        {/* Safe Route Quick Action */}
+        {evacuationRoute && (
+          <div
+            onClick={() => onNavigate('map')}
+            className={`p-4 rounded-2xl border cursor-pointer flex flex-col justify-between group transition-all ${
+              citizenSafetyStatus === 'CRITICAL' || citizenSafetyStatus === 'HIGH_RISK'
+                ? 'bg-amber-950/80 border-amber-600/60 hover:border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.2)]'
+                : 'bg-emerald-950/60 border-emerald-700/50 hover:border-emerald-500'
+            }`}
+          >
+            <div>
+              <div className={`flex items-center gap-1.5 font-bold mb-1.5 ${
+                citizenSafetyStatus === 'CRITICAL' || citizenSafetyStatus === 'HIGH_RISK'
+                  ? 'text-amber-400'
+                  : 'text-emerald-400'
+              }`}>
+                <Navigation className="w-4 h-4" />
+                {citizenSafetyStatus === 'CRITICAL' ? 'EVACUATE NOW' : 'SAFE ROUTE READY'}
+                {isTrackingLocation && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />}
+              </div>
+              <h4 className="font-bold text-white text-sm group-hover:text-emerald-300 transition-colors">
+                {evacuationRoute.shelterName}
+              </h4>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                {evacuationRoute.isHighGroundRoute ? '✓ High-ground flood-safe path' : 'Optimal walking route computed'}
+              </p>
+            </div>
+            <div className={`pt-2 border-t flex items-center justify-between font-bold ${
+              citizenSafetyStatus === 'CRITICAL' || citizenSafetyStatus === 'HIGH_RISK'
+                ? 'border-amber-800/60 text-amber-400'
+                : 'border-emerald-800/60 text-emerald-400'
+            }`}>
+              <span className="font-mono text-xs">{evacuationRoute.distanceKm} km · ~{evacuationEtaMinutes} min walk</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
         )}

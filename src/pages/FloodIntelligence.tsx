@@ -25,9 +25,11 @@ export const FloodIntelligence: React.FC = () => {
   const badgeClasses = getRiskBadgeClasses(floodRisk.riskLevel);
 
   // Prepare chart series from history
-  const chartData = snapshot.history.map((h, i) => {
-    const prev = snapshot.history[Math.max(0, i - 1)];
-    const rate = Math.round(((h.waterLevel - prev.waterLevel) / 0.0416) * 10) / 10;
+  const floodHistory = snapshot.history.filter((h) => !h.nodeId || h.nodeId === snapshot.primaryFloodNode?.id);
+  const chartData = floodHistory.map((h, i) => {
+    const prev = floodHistory[Math.max(0, i - 1)];
+    const elapsedMinutes = i === 0 ? 0 : (new Date(h.timestamp).getTime() - new Date(prev.timestamp).getTime()) / 60000;
+    const rate = elapsedMinutes > 0 ? Math.round(((h.waterLevel - prev.waterLevel) / elapsedMinutes) * 10) / 10 : 0;
     return {
       time: h.timeLabel,
       waterLevel: h.waterLevel,
@@ -40,23 +42,23 @@ export const FloodIntelligence: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Flood Header */}
-      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 lg:p-6 backdrop-blur-md shadow-xl relative overflow-hidden">
+      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-4 sm:p-5 lg:p-6 backdrop-blur-md shadow-xl relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-cyan-500 to-sky-400" />
 
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase">
+              <span className="text-[11px] sm:text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase">
                 HYDRODYNAMIC INTELLIGENCE MODULE
               </span>
               <span className="text-slate-500">•</span>
-              <span className="text-xs font-mono text-slate-400">
-                CATCHMENT RIVER NODE 02
+              <span className="text-[11px] sm:text-xs font-mono text-slate-400">
+                RIVER NODE 02
               </span>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-3">
-              <Waves className="w-7 h-7 text-cyan-400" />
-              FLOOD INTELLIGENCE & EARLY WARNING
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-2.5 sm:gap-3">
+              <Waves className="w-6 h-6 sm:w-7 sm:h-7 text-cyan-400 shrink-0" />
+              <span>FLOOD INTELLIGENCE & EARLY WARNING</span>
             </h1>
             <p className="text-xs font-mono text-slate-400 mt-1">
               Deterministic catchment runoff modeling with dynamic rate-of-rise derivation.
@@ -64,20 +66,20 @@ export const FloodIntelligence: React.FC = () => {
           </div>
 
           {/* Scenario quick trigger buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setScenario('FLOOD')}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold shadow-lg transition-all"
+              className="flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold shadow-lg transition-all active:scale-95 shrink-0"
             >
               <Play className="w-3.5 h-3.5" />
-              SIMULATE FLOOD SURGE
+              <span>SIMULATE FLOOD SURGE</span>
             </button>
             <button
               onClick={resetToNormal}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition-colors active:scale-95 shrink-0"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              RESET
+              <span>RESET</span>
             </button>
           </div>
         </div>
@@ -85,7 +87,7 @@ export const FloodIntelligence: React.FC = () => {
         {/* Plain Language Interpretation Banner */}
         <div className="mt-4 p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-mono flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-cyan-400 font-bold uppercase">WHAT THIS MEANS:</span>
+            <span className="text-cyan-400 font-bold uppercase shrink-0">WHAT THIS MEANS:</span>
             <span className="text-slate-200">
               {floodReading.waterLevel > 60
                 ? '⚠️ Water level is rising faster than before. Rain detected. Flood risk is high.'
@@ -94,76 +96,76 @@ export const FloodIntelligence: React.FC = () => {
                 : '✓ Water level is in the safe normal range. No immediate flooding risk.'}
             </span>
           </div>
-          <span className="text-[11px] text-slate-400 hidden sm:inline">
+          <span className="text-[11px] text-slate-400 hidden md:inline shrink-0">
             Prototype Risk Model
           </span>
         </div>
 
-        {/* 4 Primary Flood Status Readouts */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5 mt-4 pt-4 border-t border-slate-800/80">
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
-            <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">
+        {/* 5 Primary Flood Status Readouts */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3.5 mt-4 pt-4 border-t border-slate-800/80">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
+            <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block mb-1">
               WATER LEVEL
             </span>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-mono font-black text-cyan-400">
+              <span className="text-2xl sm:text-3xl font-mono font-black text-cyan-400">
                 {floodReading.waterLevel.toFixed(1)}
               </span>
               <span className="text-xs font-mono text-slate-400 font-bold">cm</span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 mt-1 block">
-              Sensor: Ultrasonic HC-SR04
+            <span className="text-[10px] font-mono text-slate-400 mt-1 block truncate">
+              Ultrasonic HC-SR04
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
-            <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
+            <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block mb-1">
               RATE OF RISE
             </span>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-mono font-black text-blue-400">
+              <span className="text-2xl sm:text-3xl font-mono font-black text-blue-400">
                 {floodReading.rateOfRise !== undefined && floodReading.rateOfRise >= 0 ? '+' : ''}
                 {floodReading.rateOfRise?.toFixed(1) || '0.2'}
               </span>
-              <span className="text-xs font-mono text-slate-400 font-bold">cm/min</span>
+              <span className="text-[10px] sm:text-xs font-mono text-slate-400 font-bold">cm/min</span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 mt-1 block">
-              Computed: ΔDepth / ΔTime
+            <span className="text-[10px] font-mono text-slate-400 mt-1 block truncate">
+              Computed: ΔDepth/ΔTime
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
-            <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
+            <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block mb-1">
               RAINFALL STATUS
             </span>
             <div className="flex items-center gap-2 mt-1">
               <CloudRain className={`w-5 h-5 ${floodReading.rainfall ? 'text-amber-400 animate-bounce' : 'text-slate-500'}`} />
-              <span className={`text-xl font-mono font-bold ${floodReading.rainfall ? 'text-amber-400' : 'text-slate-400'}`}>
+              <span className={`text-lg sm:text-xl font-mono font-bold ${floodReading.rainfall ? 'text-amber-400' : 'text-slate-400'}`}>
                 {floodReading.rainfall ? 'DETECTED' : 'NONE'}
               </span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 mt-1 block">
+            <span className="text-[10px] font-mono text-slate-400 mt-1 block truncate">
               Catchment Tipping Gauge
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
-            <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70">
+            <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block mb-1">
               FLOOD RISK SCORE
             </span>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-mono font-black text-white">
+              <span className="text-2xl sm:text-3xl font-mono font-black text-white">
                 {floodRisk.riskScore}
               </span>
               <span className="text-xs font-mono text-slate-400 font-bold">%</span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 mt-1 block">
+            <span className="text-[10px] font-mono text-slate-400 mt-1 block truncate">
               Multi-Factor Weighted
             </span>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70 flex flex-col justify-center">
-            <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/70 flex flex-col justify-center col-span-2 sm:col-span-1">
+            <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block mb-1">
               SEVERITY LEVEL
             </span>
             <span className={`px-2.5 py-1 rounded text-xs font-mono font-bold uppercase border text-center ${badgeClasses}`}>
@@ -184,7 +186,7 @@ export const FloodIntelligence: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Chart 1: Water Level */}
-          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4">
+          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4 min-w-0">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs font-mono font-bold text-cyan-400 uppercase">
                 1. WATER LEVEL DEPTH (cm)
@@ -213,7 +215,7 @@ export const FloodIntelligence: React.FC = () => {
           </div>
 
           {/* Chart 2: Rate of Rise */}
-          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4">
+          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4 min-w-0">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs font-mono font-bold text-blue-400 uppercase">
                 2. DYNAMIC RATE OF RISE (cm/min)
@@ -242,7 +244,7 @@ export const FloodIntelligence: React.FC = () => {
           </div>
 
           {/* Chart 3: Rainfall */}
-          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4">
+          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4 min-w-0">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs font-mono font-bold text-amber-400 uppercase">
                 3. BASIN RAINFALL INTENSITY
@@ -271,7 +273,7 @@ export const FloodIntelligence: React.FC = () => {
           </div>
 
           {/* Chart 4: Flood Risk Score */}
-          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4">
+          <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-4 min-w-0">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs font-mono font-bold text-red-400 uppercase">
                 4. FLOOD RISK ASSESSMENT ESCALATION (%)

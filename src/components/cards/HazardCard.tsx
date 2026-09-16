@@ -63,7 +63,7 @@ export const HazardCard: React.FC<HazardCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`group relative bg-slate-900/75 hover:bg-slate-850/90 border rounded-xl p-5 cursor-pointer transition-all duration-300 backdrop-blur-md flex flex-col justify-between overflow-hidden ${
+      className={`group relative bg-slate-900/75 hover:bg-slate-850/90 border rounded-xl p-4 sm:p-5 cursor-pointer transition-all duration-300 backdrop-blur-md flex flex-col justify-between overflow-hidden ${
         isCritical
           ? 'border-red-500/70 shadow-[0_0_25px_rgba(239,68,68,0.25)] ring-1 ring-red-500/40'
           : isHigh
@@ -79,30 +79,30 @@ export const HazardCard: React.FC<HazardCardProps> = ({
 
       <div>
         {/* Header with Hazard Title & Human-Friendly Level Badge */}
-        <div className="flex items-start justify-between mb-3.5">
-          <div className="flex items-center gap-2.5">
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors shadow-inner flex-shrink-0"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-colors shadow-inner shrink-0"
               style={{
                 backgroundColor: `${color}18`,
                 border: `1px solid ${color}40`,
                 color: color
               }}
             >
-              <Icon className="w-5 h-5" />
+              <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <h3 className="font-bold text-base text-slate-100 uppercase tracking-wide group-hover:text-cyan-300 transition-colors">
+            <div className="min-w-0">
+              <h3 className="font-bold text-sm sm:text-base text-slate-100 uppercase tracking-wide group-hover:text-cyan-300 transition-colors truncate">
                 {title}
               </h3>
-              <span className="text-[11px] font-mono text-slate-400">
+              <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 block truncate">
                 Monitoring Area
               </span>
             </div>
           </div>
 
           {/* Simple Severity Badge */}
-          <span className={`px-2.5 py-1 rounded text-xs font-mono font-bold uppercase border flex items-center gap-1.5 ${badgeClass}`}>
+          <span className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded text-[11px] sm:text-xs font-mono font-bold uppercase border flex items-center gap-1 shrink-0 ${badgeClass}`}>
             <span>{statusEmoji}</span>
             <span>{riskLevel}</span>
           </span>

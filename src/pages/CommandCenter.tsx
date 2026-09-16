@@ -77,7 +77,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate }) => {
     <div className="space-y-6 pb-12">
       {/* 1. CURRENT STATUS BANNER — Immediate 5-second clarity */}
       <div
-        className={`rounded-2xl p-4.5 border backdrop-blur-md shadow-xl transition-all flex flex-col md:flex-row md:items-center justify-between gap-3 ${
+        className={`rounded-2xl p-3.5 sm:p-4.5 border backdrop-blur-md shadow-xl transition-all flex flex-col md:flex-row md:items-center justify-between gap-3 ${
           isCritical
             ? 'bg-red-950/70 border-red-500/80 shadow-[0_0_25px_rgba(239,68,68,0.25)]'
             : isHigh
@@ -85,9 +85,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate }) => {
             : 'bg-emerald-950/40 border-emerald-600/60 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
         }`}
       >
-        <div className="flex items-start md:items-center gap-3">
+        <div className="flex items-start md:items-center gap-2.5 sm:gap-3">
           <div
-            className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 ${
               isDanger
                 ? 'bg-red-500/20 text-red-400 border border-red-500/40'
                 : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
@@ -101,12 +101,12 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate }) => {
           </div>
 
           <div>
-            <div className="flex items-center gap-2 mb-0.5">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-0.5">
               <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-bold">
-                CURRENT ENVIRONMENTAL STATUS:
+                STATUS:
               </span>
               <span
-                className={`text-xs font-mono font-black uppercase px-2 py-0.5 rounded ${
+                className={`text-[11px] sm:text-xs font-mono font-black uppercase px-2 py-0.5 rounded ${
                   isCritical
                     ? 'bg-red-600 text-white'
                     : isHigh
@@ -117,7 +117,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate }) => {
                 {isDanger ? (isCritical ? '🔴 CRITICAL DANGER' : '🟠 HIGH WARNING') : '🟢 ALL AREAS SAFE'}
               </span>
             </div>
-            <h2 className="text-base sm:text-lg font-bold text-white tracking-wide">
+            <h2 className="text-sm sm:text-base lg:text-lg font-bold text-white tracking-wide leading-snug">
               {isDanger
                 ? floodRisk.riskLevel === 'CRITICAL' || floodRisk.riskLevel === 'HIGH'
                   ? 'Severe Flood Danger in River Drainage Area — Water Rising Rapidly'
@@ -127,14 +127,14 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-end md:self-auto font-mono text-xs">
+        <div className="flex items-center gap-2 self-start md:self-auto font-mono text-xs shrink-0">
           {snapshot.activeScenario !== 'NORMAL' ? (
-            <span className="px-2.5 py-1 rounded bg-purple-950 border border-purple-600 text-purple-300 font-bold flex items-center gap-1.5">
+            <span className="px-2.5 py-1 rounded bg-purple-950 border border-purple-600 text-purple-300 font-bold flex items-center gap-1.5 text-[11px]">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>🟣 DEMO MODE ACTIVE</span>
+              <span>🟣 DEMO MODE</span>
             </span>
           ) : (
-            <span className="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-emerald-400 font-medium flex items-center gap-1.5">
+            <span className="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-emerald-400 font-medium flex items-center gap-1.5 text-[11px]">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>🟢 LIVE MONITORING</span>
             </span>
@@ -143,25 +143,25 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate }) => {
       </div>
 
       {/* 2. "WHAT'S HAPPENING?" SECTION — Natural Language Summary */}
-      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 backdrop-blur-md shadow-lg relative overflow-hidden">
+      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-4 sm:p-5 backdrop-blur-md shadow-lg relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-emerald-400" />
 
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-xs font-mono font-bold tracking-wider text-cyan-400 uppercase">
               <Activity className="w-3.5 h-3.5" />
               <span>WHAT'S HAPPENING RIGHT NOW?</span>
             </div>
-            <p className="text-sm md:text-base font-sans text-slate-100 font-medium leading-relaxed max-w-4xl">
+            <p className="text-xs sm:text-sm md:text-base font-sans text-slate-100 font-medium leading-relaxed max-w-4xl">
               "{getWhatsHappeningText()}"
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             {isDanger ? (
               <button
                 onClick={() => onNavigate(floodRisk.riskScore > wildfireRisk.riskScore ? 'flood' : 'wildfire')}
-                className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-mono text-xs font-bold transition-all shadow-lg flex items-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-mono text-xs font-bold transition-all shadow-lg flex items-center justify-center gap-1.5 active:scale-95"
               >
                 <span>SEE WHAT TO DO NEXT</span>
                 <ArrowRight className="w-4 h-4" />
@@ -177,11 +177,11 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate }) => {
 
         {/* Simple Human-Friendly "Why is the risk high?" Explanation Box if elevated */}
         {isDanger && (
-          <div className="mt-4 pt-4 border-t border-slate-800/80 bg-slate-950/60 -mx-5 -mb-5 p-5">
+          <div className="mt-4 pt-3.5 border-t border-slate-800/80 bg-slate-950/60 -mx-4 sm:-mx-5 -mb-4 sm:-mb-5 p-3.5 sm:p-5">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-300 block mb-2">
               WHY IS THE RISK HIGH? (EARTHSYNC DETECTED MULTIPLE WARNING SIGNS)
             </span>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 font-mono text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-2.5 font-mono text-xs">
               {floodRisk.riskLevel === 'CRITICAL' || floodRisk.riskLevel === 'HIGH' ? (
                 <>
                   <div className="p-2.5 rounded-lg bg-blue-950/40 border border-blue-800/60 text-cyan-200 flex items-center gap-2">
@@ -218,42 +218,42 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate }) => {
         )}
       </div>
 
-      {/* 3. SIMPLIFIED CONNECTED SENSORS QUICK STRIP (Section 15) */}
-      <div className="p-3.5 rounded-xl bg-slate-900/70 border border-slate-800/80 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+      {/* 3. SIMPLIFIED CONNECTED SENSORS QUICK STRIP */}
+      <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900/70 border border-slate-800/80 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs font-mono">
         <div className="flex items-center gap-2 text-slate-400 font-bold uppercase">
           <Radio className="w-4 h-4 text-cyan-400" />
           <span>CONNECTED SENSORS:</span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
             <span className="text-slate-300">Flood Node (River-02)</span>
-            <span className="text-slate-500">— Online</span>
+            <span className="text-slate-500 hidden sm:inline">— Online</span>
           </div>
 
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
             <span className="text-slate-300">Fire Node (Forest-01)</span>
-            <span className="text-slate-500">— Online</span>
+            <span className="text-slate-500 hidden sm:inline">— Online</span>
           </div>
 
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
             <span className="text-slate-300">Headwaters (River-01)</span>
-            <span className="text-slate-500">— Online</span>
+            <span className="text-slate-500 hidden sm:inline">— Online</span>
           </div>
 
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-amber-400" />
             <span className="text-slate-300">West Canopy (Forest-02)</span>
-            <span className="text-amber-400">— Weak Signal</span>
+            <span className="text-amber-400 hidden sm:inline">— Weak</span>
           </div>
         </div>
 
         <button
           onClick={() => onNavigate('sensor-network')}
-          className="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 self-start sm:self-auto"
+          className="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 self-start sm:self-auto shrink-0"
         >
           <span>View All 12 Sensors</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -369,7 +369,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate }) => {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3.5">
           <SensorMetricCard
             title="WATER LEVEL"
             value={floodReading.waterLevel.toFixed(1)}
@@ -450,14 +450,14 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate }) => {
       </div>
 
       {/* 6. LIVE TREND AREA & RADIAL RISK GAUGE */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
         {/* Recharts Live Trend Area (8 cols) */}
-        <div className="lg:col-span-8">
+        <div className="lg:col-span-8 min-w-0">
           <LiveTrendChart data={snapshot.history} />
         </div>
 
         {/* Animated Radial Risk Gauge (4 cols) */}
-        <div className="lg:col-span-4 bg-slate-900/80 border border-slate-800/80 rounded-xl p-5 backdrop-blur-md flex flex-col items-center justify-between min-h-[380px]">
+        <div className="lg:col-span-4 min-w-0 bg-slate-900/80 border border-slate-800/80 rounded-xl p-4 sm:p-5 backdrop-blur-md flex flex-col items-center justify-between min-h-[340px] sm:min-h-[380px]">
           <div className="w-full flex items-center justify-between pb-3 border-b border-slate-800">
             <span className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase">
               OVERALL RISK ASSESSMENT
@@ -470,7 +470,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate }) => {
           <div className="my-auto py-2">
             <RadialRiskGauge
               score={compositeRiskScore}
-              size={210}
+              size={200}
               label="PEAK RISK SCORE"
               sublabel="HIGHEST DETECTED HAZARD"
             />
@@ -494,14 +494,14 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate }) => {
       <CorrelationMatrix />
 
       {/* 8. INTELLIGENCE PANEL & ACTIONABLE ALERTS */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
         {/* EarthSync Intelligence Panel (6 cols) */}
-        <div className="lg:col-span-6">
+        <div className="lg:col-span-6 min-w-0">
           <EarthSyncIntelligencePanel />
         </div>
 
         {/* Actionable Alerts & Live Event Timeline (6 cols) */}
-        <div className="lg:col-span-6 space-y-4">
+        <div className="lg:col-span-6 min-w-0 space-y-4">
           <div className="bg-slate-900/80 border border-slate-800/80 rounded-xl p-5 backdrop-blur-md">
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">

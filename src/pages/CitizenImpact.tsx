@@ -63,24 +63,24 @@ export const CitizenImpact: React.FC = () => {
   return (
     <div className="space-y-6 font-sans">
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/80 border border-slate-800 p-5 rounded-2xl backdrop-blur-md">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/80 border border-slate-800 p-4 sm:p-5 rounded-2xl backdrop-blur-md">
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 uppercase tracking-wider mb-1">
-            <Users className="w-4 h-4" />
-            <span>POPULATION RESILIENCE & EVACUATION MANAGEMENT</span>
+          <div className="flex items-center gap-2 text-[10px] sm:text-xs font-mono text-cyan-400 uppercase tracking-wider mb-1">
+            <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span>POPULATION RESILIENCE & EVACUATION</span>
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
-            Citizen Impact & Early Warning Dissemination
+          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+            Citizen Impact & Early Warning
           </h1>
           <p className="text-xs text-slate-400 mt-1">
             Real-time population exposure tracking, multi-channel CAP alert broadcast funnel, and shelter occupancy
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-slate-300">
             <Users className="w-4 h-4 text-emerald-400" />
-            <span>{totalCitizens.toLocaleString()} MONITORED CITIZENS</span>
+            <span>{totalCitizens.toLocaleString()} CITIZENS</span>
           </div>
         </div>
       </div>
@@ -208,9 +208,9 @@ export const CitizenImpact: React.FC = () => {
           )}
 
           <form onSubmit={handleSendBroadcast} className="space-y-3">
-            <div className="flex items-center gap-2 text-xs">
+            <div className="flex flex-wrap items-center gap-2 text-xs">
               <label className="text-slate-400 font-medium">Severity Tier:</label>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => setBroadcastSeverity('CRITICAL')}

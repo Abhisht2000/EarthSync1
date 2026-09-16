@@ -303,6 +303,13 @@ export class ESP32SensorService implements ISensorService {
       }
     ];
 
+    // These are layout placeholders only.  Until a backend snapshot or an ESP
+    // heartbeat arrives, never represent them as connected field hardware.
+    baseNodes.forEach((node) => {
+      node.status = 'OFFLINE';
+      node.lastUpdated = 'Awaiting device heartbeat';
+    });
+
     this.snapshot = {
       nodes: baseNodes,
       primaryFloodNode: baseNodes[1],
@@ -346,7 +353,7 @@ export class ESP32SensorService implements ISensorService {
     }
     if (typeof window !== 'undefined') {
       const proto = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-      return `${proto}${window.location.host}/ws`;
+      return `${proto}${window.location.hostname}:5000/ws`;
     }
     return 'ws://localhost:5000/ws';
   }
@@ -415,8 +422,17 @@ export class ESP32SensorService implements ISensorService {
 
   private handleIncomingReading(reading: SensorReading) {
     const idx = this.snapshot.nodes.findIndex((n) => n.id === reading.nodeId);
+    const hardwareReading = reading as SensorReading & { alarm?: boolean; alarmType?: string };
+    const status: SensorNode['status'] = hardwareReading.alarm
+      ? 'CRITICAL'
+      : (reading.rainfall || reading.smokeLevel === 'MEDIUM' || reading.waterLevel >= 10)
+        ? 'WARNING'
+        : 'ONLINE';
     if (idx !== -1) {
       this.snapshot.nodes[idx].lastReading = reading;
+      this.snapshot.nodes[idx].status = status;
+      this.snapshot.nodes[idx].battery = reading.battery ?? this.snapshot.nodes[idx].battery;
+      this.snapshot.nodes[idx].signalRssi = reading.signalRssi ?? this.snapshot.nodes[idx].signalRssi;
       this.snapshot.nodes[idx].lastUpdated = 'Just now';
       if (reading.waterLevel !== undefined) {
         this.snapshot.primaryFloodNode = this.snapshot.nodes[idx];
@@ -427,20 +443,34 @@ export class ESP32SensorService implements ISensorService {
     } else {
       const newNode: SensorNode = {
         id: reading.nodeId,
-        name: `Hardware Node ${reading.nodeId}`,
+        name: `NodeMCU ESP8266 (${reading.nodeId})`,
         hazardType: reading.waterLevel !== undefined ? 'flood' : 'wildfire',
         zone: 'Field Telemetry Sector',
         latitude: 28.625,
         longitude: 77.225,
-        status: 'ONLINE',
+        status,
         battery: reading.battery || 90,
         signalRssi: reading.signalRssi || -70,
-        firmwareVersion: 'v2.4.1-esp32',
+        firmwareVersion: 'NodeMCU ESP8266',
         lastUpdated: 'Just now',
         lastReading: reading
       };
       this.snapshot.nodes.push(newNode);
     }
+    this.snapshot.history = [
+      ...this.snapshot.history,
+      {
+        nodeId: reading.nodeId,
+        timestamp: reading.timestamp || new Date().toISOString(),
+        timeLabel: new Date(reading.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        waterLevel: Number(reading.waterLevel) || 0,
+        temperature: Number(reading.temperature) || 0,
+        humidity: Number(reading.humidity) || 0,
+        smokePpm: Number(reading.smokePpm) || 0,
+        rainfall: reading.rainfall ? 1 : 0,
+        riskScore: 0
+      }
+    ].slice(-120);
     this.notify();
   }
 

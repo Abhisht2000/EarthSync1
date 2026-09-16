@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 export const CitizenMap: React.FC = () => {
-  const { language, closestSafeLocations, currentUser, nearbyHazards } = useEarthSync();
+  const { language, closestSafeLocations, currentUser, nearbyHazards, isTrackingLocation, evacuationRoute, citizenSafetyStatus } = useEarthSync();
   const t = DICTIONARY[language];
 
   const [activeCategory, setActiveCategory] = useState<'ALL' | 'SHELTER' | 'HOSPITAL' | 'HAZARDS'>('ALL');
@@ -50,6 +50,27 @@ export const CitizenMap: React.FC = () => {
                   : 'Real-time relief shelters, medical centers, and geofenced hazard perimeters'}
               </p>
             </div>
+          </div>
+
+          {/* GPS tracking status strip */}
+          <div className={`mt-3 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono font-bold border ${
+            isTrackingLocation
+              ? 'bg-cyan-950/60 border-cyan-700/40 text-cyan-300'
+              : 'bg-slate-800/60 border-slate-700/40 text-slate-400'
+          }`}>
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isTrackingLocation ? 'bg-cyan-400 animate-pulse' : 'bg-slate-500'}`} />
+            {isTrackingLocation ? (
+              <><span className="text-cyan-300">📡 LIVE GPS ACTIVE</span><span className="text-slate-500 ml-1 hidden sm:inline">· {currentUser.location.latitude.toFixed(4)}, {currentUser.location.longitude.toFixed(4)} ±{currentUser.location.accuracyMeters ?? '?'}m</span></>
+            ) : (
+              <span>📍 Using saved location — tap Allow GPS for real-time tracking</span>
+            )}
+            {evacuationRoute && (
+              <span className={`ml-auto shrink-0 px-2 py-0.5 rounded-full border text-[10px] ${
+                citizenSafetyStatus === 'CRITICAL' ? 'bg-amber-950 border-amber-600 text-amber-300' : 'bg-emerald-950 border-emerald-600 text-emerald-300'
+              }`}>
+                🚶 {evacuationRoute.distanceKm}km · {evacuationRoute.etaMinutes}min
+              </span>
+            )}
           </div>
 
           {/* Quick Route to Nearest Safe Shelter */}

@@ -33,31 +33,31 @@ export const ScenarioSimulator: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Simulator Header */}
-      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 lg:p-6 backdrop-blur-md shadow-xl relative overflow-hidden">
+      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-4 sm:p-5 lg:p-6 backdrop-blur-md shadow-xl relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-cyan-500 to-emerald-400" />
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono font-bold tracking-widest text-purple-400 uppercase">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span className="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-purple-400 uppercase">
                 EARTHSYNC COMMAND LAB
               </span>
               <span className="text-slate-500">•</span>
-              <span className="px-2 py-0.5 rounded bg-amber-950/80 border border-amber-600/80 text-[11px] font-mono font-bold text-amber-300 animate-pulse">
+              <span className="px-2 py-0.5 rounded bg-amber-950/80 border border-amber-600/80 text-[10px] sm:text-[11px] font-mono font-bold text-amber-300 animate-pulse">
                 ● SIMULATION MODE
               </span>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-3">
-              <Sliders className="w-7 h-7 text-purple-400" />
-              SCENARIO SIMULATOR & EDGE RESILIENCE
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-white uppercase flex items-center gap-2.5 sm:gap-3">
+              <Sliders className="w-6 h-6 sm:w-7 h-7 text-purple-400 shrink-0" />
+              <span>SCENARIO SIMULATOR & RESILIENCE</span>
             </h1>
             <p className="text-xs font-mono text-slate-400 mt-1">
               Test dynamic multi-hazard early warning sequences, voice alert dispatch, and offline edge failover.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-slate-400">ACTIVE STATE:</span>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs font-mono text-slate-400">STATE:</span>
             <span className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-cyan-300 text-xs font-mono font-bold">
               {active} (STAGE {step})
             </span>

@@ -29,7 +29,7 @@ export const CitizenLayout: React.FC = () => {
       <CitizenTopBar />
 
       {/* Main Container View Area */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 pt-4 pb-20">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-4 pt-3 sm:pt-4 pb-24 pb-safe touch-scroll">
         {activeTab === 'home' && <CitizenHome onNavigate={setActiveTab} />}
         {activeTab === 'map' && <CitizenMap />}
         {activeTab === 'alerts' && <CitizenAlerts />}
